@@ -1,0 +1,6 @@
+.env
+.env.*
+!.env.example
+agent-logs/
+.DS_Store
+__pycache__/

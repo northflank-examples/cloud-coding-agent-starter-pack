@@ -1,0 +1,5 @@
+# One task per line: <short-name>: <prompt>
+# Each line becomes its own Cloud Harness, working on its own branch agent/<short-name>.
+signup-validation: Add input validation to the signup endpoint, with tests for each invalid case
+billing-tests: Write integration tests for the billing module and make them pass
+utcnow-cleanup: Replace deprecated datetime.utcnow() calls with timezone-aware equivalents

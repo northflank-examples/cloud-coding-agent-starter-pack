@@ -1,0 +1,1471 @@
+{
+  "schema_version": 1,
+  "last_updated": "2026-10-19",
+  "currency": "USD",
+  "notes": [
+    "Every value comes from the vendor's own pricing page, docs or official blog, on the date in last_verified.",
+    "null means 'not published or not verified', never 'free' or 'unlimited'.",
+    "features.*.value is the short text shown in tables; features.*.detail is the longer text shown on the platform page.",
+    "Per-hour prices are list prices for the default/US region, quoted at reference_size."
+  ],
+  "reference_size": {
+    "vcpu": 2,
+    "memory_gib": 4,
+    "cpu_busy": 0.25
+  },
+  "scenarios": [
+    {
+      "id": "solo-developer",
+      "short": "1 dev, workdays",
+      "description": "one developer's persistent agent workspace (2 vCPU, 4 GiB, 20 GB), running 8 h × 22 working days (176 h) and paused the rest of the month.",
+      "environments": 1,
+      "hours": 176,
+      "vcpu": 2,
+      "memory_gib": 4,
+      "disk_gb": 20,
+      "months": 1,
+      "cpu_busy": 0.25
+    },
+    {
+      "id": "parallel-agents",
+      "short": "10 agents × 1 h",
+      "description": "10 coding agents working in parallel for one hour on separate tasks (2 vCPU, 4 GiB each), discarded afterwards.",
+      "environments": 10,
+      "hours": 1,
+      "vcpu": 2,
+      "memory_gib": 4,
+      "cpu_busy": 0.25
+    },
+    {
+      "id": "batch-tasks",
+      "short": "100 tasks × 30 min",
+      "description": "100 short agent tasks such as dependency bumps or lint fixes (2 vCPU, 4 GiB), 30 minutes each, ephemeral.",
+      "environments": 100,
+      "hours": 0.5,
+      "vcpu": 2,
+      "memory_gib": 4,
+      "cpu_busy": 0.25
+    },
+    {
+      "id": "team-always-on",
+      "short": "10 × 24/7 (month)",
+      "description": "10 always-on agent workspaces for a team (2 vCPU, 4 GiB, 20 GB each), running 24/7 for a 730-hour month.",
+      "environments": 10,
+      "hours": 730,
+      "vcpu": 2,
+      "memory_gib": 4,
+      "disk_gb": 20,
+      "months": 1,
+      "cpu_busy": 0.1
+    }
+  ],
+  "platforms": [
+    {
+      "id": "northflank",
+      "name": "Northflank Cloud Harness",
+      "category": "managed-harness",
+      "maintainer_disclosure": true,
+      "website": "https://northflank.com/blog/how-to-run-remote-coding-agents",
+      "docs_url": "https://northflank.com/docs/v1/application/cloud-harness/quickstart",
+      "pricing_url": "https://northflank.com/pricing",
+      "last_verified": "2026-10-19",
+      "summary": "MicroVM-isolated cloud workspaces preconfigured for a coding agent (Claude Code, Codex, Cursor, OpenCode, Pi, Devin CLI or OMP) or as an empty sandbox for any agent, on Northflank's cloud or in your own cloud account, with a web terminal, SSH/IDE access and a persistent /home/harness workspace.",
+      "features": {
+        "agents": {
+          "value": "Claude Code, Codex, Cursor, OpenCode, Pi, Devin CLI, OMP; any other agent in an empty sandbox",
+          "bring_your_own": true,
+          "quote": "`type`: (string) (required) The harness environment type to run. (enum: codex, claude, pi, omp, devin, opencode, cursor, none)",
+          "source": "https://northflank.com/docs/v1/api/project/harnesses/create-harness"
+        },
+        "environment": {
+          "value": "Northflank harness image, your own build, or any registry image; CPU/RAM from 0.1 to 32 vCPU plans",
+          "quote": "Container image source. Managed uses the Northflank harness image, internal uses a Northflank build service, and external uses a registry image. (enum: managed, internal, external)",
+          "source": "https://northflank.com/docs/v1/api/project/harnesses/create-harness.md"
+        },
+        "isolation": {
+          "value": "Kata microVM per harness",
+          "detail": "Each harness runs in its own microVM with its own kernel. BYOC clusters need a microVM runtime (Kata Containers) on nodes that support it.",
+          "quote": "Each Harness runs in its own isolated microVM, separating its workloads from other Harnesses and the underlying host infrastructure.",
+          "source": "https://northflank.com/blog/how-to-run-remote-coding-agents"
+        },
+        "api": {
+          "value": "REST API, JavaScript SDK, Python SDK, CLI, dashboard",
+          "detail": "REST endpoints under /v1/projects/{projectId}/harnesses (list, create, put, get, patch, delete, logs, pause, restart, resume); JavaScript SDK `@northflank/js-client`, Python SDK `northflank` (pip), and the `northflank` CLI (`northflank dev ssh` connects from a terminal or editor).",
+          "quote": "You create them, run commands, access files, and destroy them programmatically with the JavaScript or Python SDK.",
+          "source": "https://northflank.com/docs/v1/application/sandboxes/quickstart"
+        },
+        "persistence": {
+          "value": "Yes: persistent workspace volume, 5–100 GiB (on by default)",
+          "detail": "Persist workspace files is on by default and keeps the workspace across pauses, restarts and redeploys. The volume is 5,120–102,400 MiB, can grow but not shrink, and persistence can only be set at creation.",
+          "quote": "Persist workspace files is enabled by default under Advanced → Workspace storage. It preserves files in `/home/harness` across stops, restarts, and redeployments. Files outside this directory are temporary.",
+          "source": "https://northflank.com/docs/v1/application/cloud-harness/configure-and-manage-cloud-harnesses"
+        },
+        "idle": {
+          "value": "Runs until paused; paused = no compute charge",
+          "detail": "There is no automatic sleep. Pausing scales the harness to zero and stops compute billing, and persisted files remain.",
+          "quote": "Compute is billed per second, and pausing a Harness stops compute billing.",
+          "source": "https://northflank.com/blog/how-to-run-remote-coding-agents"
+        },
+        "max_session": {
+          "value": "No limit",
+          "quote": "An active Cloud Harness runs continuously until you pause or delete it.",
+          "source": "https://northflank.com/docs/v1/application/cloud-harness/quickstart"
+        },
+        "concurrency": {
+          "value": "1 harness on free projects; no limit on paid",
+          "quote": "Free projects support one harness, including paused harnesses.",
+          "source": "https://northflank.com/docs/v1/application/cloud-harness/quickstart",
+          "detail": ""
+        },
+        "access": {
+          "value": "Web terminal, SSH, VS Code / Cursor over SSH; teammates can share a harness",
+          "web_terminal": true,
+          "ssh": true,
+          "quote": "Access your Cloud Harness from your terminal, Visual Studio Code, or Cursor using SSH.",
+          "source": "https://northflank.com/docs/v1/application/cloud-harness/quickstart"
+        },
+        "git": {
+          "value": "GitHub, GitLab, Bitbucket, Azure DevOps or self-hosted Git; clone a branch, create a new branch or a new repository, plus additional repositories",
+          "source": "https://northflank.com/docs/v1/api/project/harnesses/create-harness",
+          "detail": "`source` links an existing repository and branch; `branchData` creates a new branch from a base branch; `repositoryData` creates a new repository (public or private) on a linked account; `additionalRepositories` clones more repositories alongside the primary one; `cloneDirectory` sets where the repo is cloned. Pushes go through a proxy scoped to the harness branch, with credentials that refresh automatically.",
+          "quote": "`projectType`: (string) (required) The VCS provider to use. (enum: bitbucket, gitlab, github, self-hosted, azure, origin)"
+        },
+        "secrets": {
+          "value": "Runtime variables and secret files; agent API key or linked account",
+          "source": "https://northflank.com/docs/v1/application/cloud-harness/configure-and-manage-cloud-harnesses",
+          "detail": "Runtime variables and secret files; agent API key or linked account. Team admins choose which harness types members can create (Harness policies)."
+        },
+        "network": {
+          "value": "Public/private ports, custom domains, per-port IP/SSO/basic-auth rules",
+          "detail": "Add HTTP, HTTP/2, TCP or UDP ports, public or private, with custom domains and per-port security rules. No outbound egress allowlist for harnesses is documented.",
+          "source": "https://northflank.com/docs/v1/application/cloud-harness/configure-and-manage-cloud-harnesses"
+        },
+        "byoc": {
+          "value": "Yes, self-serve: AWS, AWS European Sovereign Cloud, GCP, Azure, Oracle, Civo, CoreWeave, Nebius; or import your own Kubernetes cluster (BYOK)",
+          "detail": "Northflank provisions and manages the cluster in your account, on the provider's managed Kubernetes service (EKS, GKE, AKS, OKE, Civo Kubernetes, CKS, Nebius Managed Kubernetes). Harnesses need nodes that support a microVM runtime (Kata Containers).",
+          "quote": "You can also import an existing Kubernetes cluster (BYOK) for Northflank to manage.",
+          "source": "https://northflank.com/docs/v1/application/bring-your-own-cloud/use-other-cloud-providers-with-northflank"
+        }
+      },
+      "pricing": {
+        "model": "fixed",
+        "summary": "per-second compute, no plan fee",
+        "cpu_per_vcpu_hour": 0.01667,
+        "memory_per_gib_hour": 0.00833,
+        "fixed_sizes": [
+          {
+            "name": "nf-compute-10",
+            "vcpu": 0.1,
+            "memory_gib": 0.25
+          },
+          {
+            "name": "nf-compute-20",
+            "vcpu": 0.2,
+            "memory_gib": 0.5
+          },
+          {
+            "name": "nf-compute-50",
+            "vcpu": 0.5,
+            "memory_gib": 1
+          },
+          {
+            "name": "nf-compute-100-1",
+            "vcpu": 1,
+            "memory_gib": 1
+          },
+          {
+            "name": "nf-compute-100-2",
+            "vcpu": 1,
+            "memory_gib": 2
+          },
+          {
+            "name": "nf-compute-100-4",
+            "vcpu": 1,
+            "memory_gib": 4
+          },
+          {
+            "name": "nf-compute-200",
+            "vcpu": 2,
+            "memory_gib": 4
+          },
+          {
+            "name": "nf-compute-200-8",
+            "vcpu": 2,
+            "memory_gib": 8
+          },
+          {
+            "name": "nf-compute-200-16",
+            "vcpu": 2,
+            "memory_gib": 16
+          },
+          {
+            "name": "nf-compute-400",
+            "vcpu": 4,
+            "memory_gib": 8
+          },
+          {
+            "name": "nf-compute-400-16",
+            "vcpu": 4,
+            "memory_gib": 16
+          },
+          {
+            "name": "nf-compute-800-8",
+            "vcpu": 8,
+            "memory_gib": 8
+          },
+          {
+            "name": "nf-compute-800-16",
+            "vcpu": 8,
+            "memory_gib": 16
+          },
+          {
+            "name": "nf-compute-800-24",
+            "vcpu": 8,
+            "memory_gib": 24
+          },
+          {
+            "name": "nf-compute-800-32",
+            "vcpu": 8,
+            "memory_gib": 32
+          },
+          {
+            "name": "nf-compute-800-40",
+            "vcpu": 8,
+            "memory_gib": 40
+          },
+          {
+            "name": "nf-compute-1200-24",
+            "vcpu": 12,
+            "memory_gib": 24
+          },
+          {
+            "name": "nf-compute-1600-32",
+            "vcpu": 16,
+            "memory_gib": 32
+          },
+          {
+            "name": "nf-compute-2000-40",
+            "vcpu": 20,
+            "memory_gib": 40
+          },
+          {
+            "name": "nf-compute-32-131072",
+            "vcpu": 32,
+            "memory_gib": 128
+          }
+        ],
+        "storage_per_gb_month": 0.15,
+        "storage": "Volumes $0.15/GB-month",
+        "plan_fee": "None (pay-as-you-go)",
+        "free_tier": "Free projects: 1 harness, up to 1 vCPU / 1 GB",
+        "byoc": "$0.02083/vCPU-hour management fee, $0 memory; cloud costs paid to your provider",
+        "raw_quotes": [
+          "CPU $ 0.01667 / vCPU / hour",
+          "Memory $ 0.00833 / GB / hour",
+          "Disk $ 0.15 / GB / month",
+          "nf-compute-200 vCPU 2 dedicated Memory 4096 MB Price $ 48.00 /month ($ 0.0667 /hr)",
+          "Free projects support one harness, including paused harnesses.",
+          "Compute is billed per second, and pausing a Harness stops compute billing."
+        ],
+        "published_checks": [
+          {
+            "label": "nf-compute-200 (2 vCPU / 4 GB) $0.0667/hr",
+            "vcpu": 2,
+            "memory_gib": 4,
+            "hourly": 0.0667
+          },
+          {
+            "label": "nf-compute-400-16 (4 vCPU / 16 GB) $0.20/hr",
+            "vcpu": 4,
+            "memory_gib": 16,
+            "hourly": 0.2,
+            "tolerance": 0.001
+          }
+        ],
+        "sources": [
+          "https://northflank.com/pricing",
+          "https://api.northflank.com/v1/plans",
+          "https://northflank.com/docs/v1/application/cloud-harness/quickstart",
+          "https://northflank.com/docs/v1/api/project/harnesses/create-harness.md"
+        ]
+      },
+      "open_questions": [
+        "Harnesses are billed on Northflank's standard compute plans: the create-harness API requires billing.deploymentPlan. The pricing page doesn't mention harnesses by name.",
+        "The default harness size isn't published. The workspace volume is 5,120–102,400 MiB per the API; its default when omitted isn't stated.",
+        "No outbound egress allowlist for harnesses is documented.",
+        "Devin CLI and OMP harness types are documented in the create-harness API reference; Northflank's quickstart and product pages will list them in an upcoming docs update.",
+        "Some Cloud Harness details here (Kata microVMs, agents continuing to run after you disconnect, branch-scoped git push credentials, and a free-plan harness limit of 1 vCPU / 1 GB) come from Northflank's Cloud Harness product page, which isn't public yet as of 2026-10-19. Source links will be added when it's live."
+      ]
+    },
+    {
+      "id": "claude-code-web",
+      "name": "Claude Code on the web",
+      "category": "vendor-hosted-agent",
+      "website": "https://claude.ai/code",
+      "docs_url": "https://code.claude.com/docs/en/claude-code-on-the-web",
+      "pricing_url": "https://claude.com/pricing",
+      "last_verified": "2026-10-19",
+      "summary": "Anthropic runs Claude Code sessions in isolated, Anthropic-managed VMs (about 4 vCPU, 16 GB RAM, 30 GB disk). Sessions count toward your Claude plan's usage limits, with no separate charge for the VM.",
+      "features": {
+        "agents": {
+          "value": "Claude Code only",
+          "bring_your_own": false,
+          "quote": "A cloud session is a Claude Code session that runs on cloud infrastructure instead of on your machine.",
+          "source": "https://code.claude.com/docs/en/claude-code-on-the-web"
+        },
+        "environment": {
+          "value": "Ubuntu 24.04 VM, ~4 vCPU / 16 GB / 30 GB; setup script; base image not replaceable",
+          "quote": "Cloud sessions in Anthropic-hosted environments run with approximate resource ceilings that may change over time: 4 vCPUs, 16 GB of RAM, 30 GB of disk",
+          "source": "https://code.claude.com/docs/en/cloud-environments"
+        },
+        "isolation": {
+          "value": "Isolated VM per session",
+          "quote": "Isolated virtual machines: each session runs in an isolated, Anthropic-managed VM.",
+          "source": "https://code.claude.com/docs/en/claude-code-on-the-web#security-and-isolation"
+        },
+        "api": {
+          "value": "Web, mobile, desktop, `claude --cloud` CLI",
+          "source": "https://code.claude.com/docs/en/claude-code-on-the-web"
+        },
+        "persistence": {
+          "value": "Setup snapshot cached ~7 days; session files kept while paused",
+          "quote": "When setup completes within roughly five minutes, Anthropic snapshots the filesystem and reuses that snapshot as the starting point for later sessions",
+          "source": "https://code.claude.com/docs/en/cloud-environments#environment-caching"
+        },
+        "idle": {
+          "value": "VM pauses after a few idle minutes; may be reclaimed",
+          "quote": "after a few minutes without activity, a session's VM pauses with its files saved.",
+          "source": "https://code.claude.com/docs/en/cloud-environments#time-limits"
+        },
+        "max_session": {
+          "value": null,
+          "detail": "No maximum session length is published. Foreground and background commands have default timeouts (10 and 30 minutes) that can be raised.",
+          "source": "https://code.claude.com/docs/en/cloud-environments#time-limits"
+        },
+        "concurrency": {
+          "value": "No published cap; shares plan rate limits",
+          "quote": "cloud sessions share rate limits with all other Claude and Claude Code usage within your account. Running multiple tasks in parallel consumes more rate limits proportionately.",
+          "source": "https://code.claude.com/docs/en/claude-code-on-the-web#limitations"
+        },
+        "access": {
+          "value": "Web/mobile/desktop UI; `claude --teleport` pulls a session local; no shell/SSH",
+          "web_terminal": false,
+          "ssh": false,
+          "source": "https://code.claude.com/docs/en/claude-code-on-the-web#continue-a-cloud-session-in-your-terminal"
+        },
+        "git": {
+          "value": "GitHub (and GHE Server on Team/Enterprise); pushes branches",
+          "source": "https://code.claude.com/docs/en/claude-code-on-the-web#limitations"
+        },
+        "secrets": {
+          "value": "Env vars; network secrets injected by proxy outside the VM",
+          "source": "https://code.claude.com/docs/en/cloud-environments#add-network-secrets"
+        },
+        "network": {
+          "value": "None / Trusted allowlist (default) / Full / Custom",
+          "source": "https://code.claude.com/docs/en/cloud-environments#access-levels"
+        },
+        "byoc": {
+          "value": "Self-hosted runners, public beta (Team/Enterprise)",
+          "quote": "Self-hosted environments are in public beta on Team and Enterprise plans and are off by default.",
+          "source": "https://code.claude.com/docs/en/self-hosted-environments"
+        }
+      },
+      "pricing": {
+        "model": "subscription",
+        "summary": "Included in Claude Pro ($20/mo), Max (from $100/mo), Team and Enterprise; counts toward plan usage limits",
+        "short": "Included in Claude plans (Pro $20/mo and up)",
+        "storage": "Included",
+        "plan_fee": "Pro $20/mo; Max from $100/mo; Team $25–$125/seat/mo",
+        "free_tier": "None (not on the free plan)",
+        "raw_quotes": [
+          "Cloud sessions are available on Pro, Max, and Team plans, and for Enterprise users with premium seats or Chat + Claude Code seats.",
+          "It counts toward your plan's usage limits alongside the rest of your Claude and Claude Code usage, and there's no separate charge for the cloud VM.",
+          "$17 Per month with annual subscription discount ( $200 billed up front). $20 if billed monthly."
+        ],
+        "sources": [
+          "https://code.claude.com/docs/en/claude-code-on-the-web",
+          "https://claude.com/pricing"
+        ]
+      },
+      "open_questions": [
+        "No documented way to run another agent (such as Codex) in a cloud session.",
+        "Organisations with ZDR, HIPAA or CMEK can't use cloud sessions."
+      ]
+    },
+    {
+      "id": "codex-cloud",
+      "name": "OpenAI Codex cloud",
+      "category": "vendor-hosted-agent",
+      "website": "https://chatgpt.com/codex",
+      "docs_url": "https://learn.chatgpt.com/docs/environments/cloud-environments",
+      "pricing_url": "https://learn.chatgpt.com/docs/pricing",
+      "last_verified": "2026-10-19",
+      "summary": "Codex runs cloud tasks in per-task isolated VMs from an environment it prepares itself. VM size depends on your ChatGPT plan, and usage comes out of the plan's Codex allowance.",
+      "features": {
+        "agents": {
+          "value": "Codex only",
+          "bring_your_own": false,
+          "source": "https://learn.chatgpt.com/docs/cloud"
+        },
+        "environment": {
+          "value": "Plus: 2 vCPU / 8 GiB / 8 GiB disk; Pro/Business/Enterprise: 4 vCPU / 16 GiB / 32 GiB",
+          "quote": "Each cloud task runs in a VM with these default resources: | Plus, Edu Plus | 2 | 8 GiB | 8 GiB | | Pro, Business, Enterprise | 4 | 16 GiB | 32 GiB |",
+          "source": "https://learn.chatgpt.com/docs/environments/cloud-environments#vm-specifications"
+        },
+        "isolation": {
+          "value": "Isolated VM workspace per task",
+          "quote": "Each new task gets its own isolated workspace from the published environment.",
+          "source": "https://learn.chatgpt.com/docs/environments/cloud-environments"
+        },
+        "api": {
+          "value": "Web, mobile, desktop, `codex cloud` CLI",
+          "source": "https://learn.chatgpt.com/docs/developer-commands?surface=cli"
+        },
+        "persistence": {
+          "value": "Task state recoverable up to 7 days",
+          "quote": "By default, a task's saved VM state is recoverable for up to seven days after you last start a turn or resume the task.",
+          "source": "https://learn.chatgpt.com/docs/environments/cloud-environments"
+        },
+        "idle": {
+          "value": null,
+          "source": "https://learn.chatgpt.com/docs/environments/cloud-environments"
+        },
+        "max_session": {
+          "value": null,
+          "source": "https://learn.chatgpt.com/docs/environments/cloud-environments"
+        },
+        "concurrency": {
+          "value": null,
+          "source": "https://learn.chatgpt.com/docs/environments/cloud-environments"
+        },
+        "access": {
+          "value": "Web/mobile/desktop UI; `codex apply` pulls the diff local; no shell/SSH",
+          "web_terminal": false,
+          "ssh": false,
+          "source": "https://learn.chatgpt.com/docs/developer-commands?surface=cli"
+        },
+        "git": {
+          "value": "GitHub only",
+          "source": "https://learn.chatgpt.com/docs/environments/cloud-environments#current-limitations"
+        },
+        "secrets": {
+          "value": "Env vars; network secrets via proxy placeholder",
+          "source": "https://learn.chatgpt.com/docs/environments/cloud-environments#configure-environment-variables-and-network-secrets"
+        },
+        "network": {
+          "value": "Package managers / custom domains / unrestricted; Tailscale",
+          "source": "https://learn.chatgpt.com/docs/environments/cloud-environments#connect-to-services"
+        },
+        "byoc": {
+          "value": null,
+          "source": "https://learn.chatgpt.com/docs/environments/cloud-environments"
+        }
+      },
+      "pricing": {
+        "model": "subscription",
+        "summary": "Included in ChatGPT Plus ($20/mo), Pro ($100–$500/mo), Business and Enterprise; shares the plan's Codex allowance; not available with API keys",
+        "short": "Included in ChatGPT plans (Plus $20/mo and up)",
+        "storage": "Included",
+        "plan_fee": "Plus $20/mo; Pro $100/$200/$500/mo; Business $20/user/mo (2+ users, annual)",
+        "free_tier": "None (not on Free or Go)",
+        "raw_quotes": [
+          "Local messages and cloud chats share your plan's usage allowance. Weekly limits may also apply.",
+          "Cloud tasks may use more of your allowance than local messages.",
+          "[API Key] No cloud-based features (GitHub code review, Slack, etc.)"
+        ],
+        "sources": [
+          "https://learn.chatgpt.com/docs/pricing",
+          "https://learn.chatgpt.com/docs/environments/cloud-environments"
+        ]
+      },
+      "open_questions": [
+        "Max task duration, idle behaviour, concurrency limits and isolation technology are not published.",
+        "Larger or custom VMs on Enterprise are priced separately through OpenAI sales."
+      ]
+    },
+    {
+      "id": "cursor-cloud-agents",
+      "name": "Cursor Cloud Agents",
+      "category": "vendor-hosted-agent",
+      "website": "https://cursor.com/agents",
+      "docs_url": "https://cursor.com/docs/cloud-agent",
+      "pricing_url": "https://cursor.com/pricing",
+      "last_verified": "2026-10-19",
+      "summary": "Cursor runs its own agent in per-agent Firecracker microVMs on AWS. It needs Cursor Premium ($30/mo) or higher, model usage is billed at API pricing, and the infrastructure is included.",
+      "features": {
+        "agents": {
+          "value": "Cursor agent only",
+          "bring_your_own": false,
+          "quote": "Cloud Agents use a curated selection of models.",
+          "source": "https://cursor.com/docs/cloud-agent"
+        },
+        "environment": {
+          "value": "Ubuntu VM from agent setup, snapshot or Dockerfile; resources not published",
+          "source": "https://cursor.com/docs/cloud-agent/setup"
+        },
+        "isolation": {
+          "value": "Firecracker microVM per agent",
+          "quote": "MicroVM isolation. Runtime workspaces run on Firecracker-based microVM infrastructure.",
+          "source": "https://cursor.com/docs/cloud-agent/security"
+        },
+        "api": {
+          "value": "Web, desktop, Slack, GitHub, Linear, API",
+          "source": "https://cursor.com/docs/cloud-agent/capabilities"
+        },
+        "persistence": {
+          "value": "Environment snapshots kept 30 days of inactivity",
+          "quote": "Environment snapshots are stored for a maximum of 30 days of inactivity.",
+          "source": "https://cursor.com/docs/cloud-agent/security-network"
+        },
+        "idle": {
+          "value": "Hibernated, then deleted on timers (values not published)",
+          "source": "https://cursor.com/docs/cloud-agent/security"
+        },
+        "max_session": {
+          "value": null,
+          "source": "https://cursor.com/docs/cloud-agent"
+        },
+        "concurrency": {
+          "value": "No published limit",
+          "quote": "You can run as many agents as you want in parallel",
+          "source": "https://cursor.com/docs/cloud-agent"
+        },
+        "access": {
+          "value": "Web/desktop UI; take control of the agent's remote desktop; no direct machine access",
+          "web_terminal": null,
+          "ssh": false,
+          "quote": "Remote desktop control",
+          "source": "https://cursor.com/docs/cloud-agent/capabilities"
+        },
+        "git": {
+          "value": "GitHub, GitLab, Bitbucket Cloud, Azure DevOps",
+          "source": "https://cursor.com/docs/cloud-agent"
+        },
+        "secrets": {
+          "value": "Env vars, redacted runtime secrets, build secrets, OIDC",
+          "source": "https://cursor.com/docs/cloud-agent/security-network#secret-protection"
+        },
+        "network": {
+          "value": "All / default + allowlist / allowlist only; Tailscale, PrivateLink",
+          "source": "https://cursor.com/docs/cloud-agent/security-network#network-access"
+        },
+        "byoc": {
+          "value": "Self-hosted machines for tool execution (pools on Enterprise)",
+          "source": "https://cursor.com/docs/cloud-agent/self-hosted"
+        }
+      },
+      "pricing": {
+        "model": "subscription",
+        "summary": "Cursor Premium ($30/mo), Super ($100/mo), Ultra ($200/mo), Teams or Enterprise; Free and Plus don't include cloud agents; model usage billed at API pricing; infrastructure included",
+        "short": "Cursor Premium ($30/mo) or higher + model usage at API rates",
+        "storage": "Included",
+        "plan_fee": "Premium ($30/mo) or higher; Teams $30+/user/mo",
+        "free_tier": "None",
+        "raw_quotes": [
+          "Cloud Agents are charged at API pricing for the selected model.",
+          "Cursor-managed Cloud Agents include the execution infrastructure.",
+          "Plans: Free $0, Plus $8, Premium $30, Super $100, Ultra $200, Teams $30+/user, Enterprise; \"Cloud agents & automations\" is not included on Free or Plus"
+        ],
+        "sources": [
+          "https://cursor.com/docs/cloud-agent",
+          "https://cursor.com/pricing"
+        ]
+      },
+      "open_questions": [
+        "Cursor's plans changed in 2026 (Free, Plus, Premium, Super, Ultra, Teams, Enterprise); cloud agents start at Premium. Check the pricing page for current names and prices.",
+        "VM size, maximum run duration and idle timer values are not published."
+      ]
+    },
+    {
+      "id": "copilot-cloud-agent",
+      "name": "GitHub Copilot cloud agent",
+      "category": "vendor-hosted-agent",
+      "website": "https://github.com/features/copilot",
+      "docs_url": "https://docs.github.com/en/copilot/concepts/copilot-surfaces/copilot-on-github",
+      "pricing_url": "https://docs.github.com/en/copilot/get-started/plans",
+      "last_verified": "2026-10-19",
+      "summary": "Copilot's cloud agent (formerly 'coding agent') runs in an ephemeral GitHub Actions runner for at most 59 minutes per session, pushes to one copilot/ branch and opens a PR. Claude and Codex partner agents are in public preview.",
+      "features": {
+        "agents": {
+          "value": "Copilot; Claude and Codex agents (preview)",
+          "bring_your_own": false,
+          "quote": "You can use third-party coding agents alongside Copilot cloud agent to work asynchronously on your development tasks.",
+          "source": "https://docs.github.com/en/copilot/concepts/agent-capabilities/about-agents/about-third-party-coding-agents"
+        },
+        "environment": {
+          "value": "GitHub Actions runner; customise with copilot-setup-steps.yml",
+          "source": "https://docs.github.com/en/copilot/how-tos/copilot-on-github/customize-copilot/customize-cloud-agent/customize-the-agent-environment"
+        },
+        "isolation": {
+          "value": "Ephemeral GitHub Actions runner",
+          "source": "https://docs.github.com/en/copilot/concepts/agents/cloud-agent/risks-and-mitigations"
+        },
+        "api": {
+          "value": "Issues, PRs, agents panel, CLI, IDEs, Slack/Jira/Linear",
+          "source": "https://docs.github.com/en/copilot/concepts/copilot-surfaces/copilot-on-github"
+        },
+        "persistence": {
+          "value": "No (ephemeral); pushed commits kept",
+          "source": "https://docs.github.com/en/copilot/how-tos/copilot-on-github/use-copilot-agents/manage-and-track-agents"
+        },
+        "idle": {
+          "value": null,
+          "source": "https://docs.github.com/en/copilot/concepts/copilot-surfaces/copilot-on-github"
+        },
+        "max_session": {
+          "value": "59 minutes (hard limit)",
+          "quote": "Each Copilot cloud agent session has a maximum execution time of 59 minutes. This limit cannot be extended or bypassed.",
+          "source": "https://docs.github.com/en/copilot/concepts/copilot-surfaces/copilot-on-github"
+        },
+        "concurrency": {
+          "value": "No published limit; one branch and PR per task",
+          "source": "https://docs.github.com/en/copilot/concepts/copilot-surfaces/copilot-on-github"
+        },
+        "access": {
+          "value": "Session logs and PR on GitHub; no shell/SSH",
+          "web_terminal": false,
+          "ssh": false,
+          "source": "https://docs.github.com/en/copilot/concepts/copilot-surfaces/copilot-on-github"
+        },
+        "git": {
+          "value": "GitHub only; one copilot/ branch per task",
+          "source": "https://docs.github.com/en/copilot/concepts/copilot-surfaces/copilot-on-github"
+        },
+        "secrets": {
+          "value": "Repo/org 'Agents' secrets and variables",
+          "source": "https://docs.github.com/en/copilot/how-tos/copilot-on-github/customize-copilot/customize-cloud-agent/configure-secrets-and-variables"
+        },
+        "network": {
+          "value": "Firewall with allowlist on by default",
+          "source": "https://docs.github.com/en/copilot/how-tos/copilot-on-github/customize-copilot/customize-the-firewall"
+        },
+        "byoc": {
+          "value": "Self-hosted Actions runners (firewall must be disabled)",
+          "source": "https://docs.github.com/en/copilot/how-tos/copilot-on-github/customize-copilot/customize-cloud-agent/customize-the-agent-environment"
+        }
+      },
+      "pricing": {
+        "model": "usage-credits",
+        "summary": "Copilot plan (Pro $10/mo to Enterprise $39/seat/mo) plus GitHub Actions minutes and AI credits per session",
+        "short": "Copilot plan + Actions minutes + AI credits",
+        "storage": "Actions storage",
+        "plan_fee": "Pro $10/mo; Pro+ $39/mo; Max $100/mo; Business $19/seat; Enterprise $39/seat",
+        "free_tier": "Not included on Copilot Free",
+        "raw_quotes": [
+          "Coding agents consume GitHub Actions minutes and AI credits. Each agent session consumes AI credits based on the model used and the number of tokens processed.",
+          "This total is converted into AI credits (1 AI credit = $0.01 USD)."
+        ],
+        "sources": [
+          "https://docs.github.com/en/copilot/get-started/plans",
+          "https://docs.github.com/en/copilot/concepts/billing-and-usage/individuals/billing",
+          "https://docs.github.com/en/copilot/concepts/agents/about-third-party-coding-agents"
+        ]
+      },
+      "open_questions": [
+        "Per-minute Actions rates depend on runner size. See GitHub Actions billing.",
+        "Annual Pro/Pro+ subscribers on legacy billing are charged premium requests instead of AI credits."
+      ]
+    },
+    {
+      "id": "github-codespaces",
+      "name": "GitHub Codespaces",
+      "category": "cloud-dev-environment",
+      "website": "https://github.com/features/codespaces",
+      "docs_url": "https://docs.github.com/en/codespaces",
+      "pricing_url": "https://docs.github.com/en/billing/concepts/product-billing/github-codespaces",
+      "last_verified": "2026-10-19",
+      "summary": "GitHub-hosted dev containers, each on its own VM, built from devcontainer.json and billed per core-hour plus GB-month storage. You install CLI agents yourself.",
+      "features": {
+        "agents": {
+          "value": "Any CLI agent you install (devcontainer)",
+          "bring_your_own": true,
+          "source": "https://docs.github.com/en/codespaces/about-codespaces/deep-dive"
+        },
+        "environment": {
+          "value": "devcontainer.json; 2 to 32 core machines",
+          "source": "https://docs.github.com/en/codespaces/customizing-your-codespace/changing-the-machine-type-for-your-codespace"
+        },
+        "isolation": {
+          "value": "Container on a dedicated VM",
+          "quote": "Each codespace that you create is hosted on a separate virtual machine.",
+          "source": "https://docs.github.com/en/codespaces/setting-up-your-project-for-codespaces/configuring-dev-containers/setting-a-minimum-specification-for-codespace-machines"
+        },
+        "api": {
+          "value": "REST API, `gh codespace` CLI",
+          "source": "https://docs.github.com/en/codespaces/developing-in-a-codespace/using-github-codespaces-with-github-cli"
+        },
+        "persistence": {
+          "value": "Yes; stopped codespaces deleted after 30 days inactive",
+          "source": "https://docs.github.com/en/codespaces/setting-your-user-preferences/configuring-automatic-deletion-of-your-codespaces"
+        },
+        "idle": {
+          "value": "Stops after 30 min idle (5–240 configurable)",
+          "quote": "The default inactivity timeout period is 30 minutes.",
+          "source": "https://docs.github.com/en/codespaces/about-codespaces/deep-dive"
+        },
+        "max_session": {
+          "value": "12 hours",
+          "quote": "A codespace has a maximum lifetime of 12 hours, regardless of your idle timeout policy or settings.",
+          "source": "https://docs.github.com/en/codespaces/about-codespaces/understanding-the-codespace-lifecycle"
+        },
+        "concurrency": {
+          "value": "Limits exist but aren't published",
+          "source": "https://docs.github.com/en/codespaces/about-codespaces/understanding-the-codespace-lifecycle"
+        },
+        "access": {
+          "value": "Browser VS Code, VS Code, JetBrains, `gh codespace ssh`",
+          "web_terminal": true,
+          "ssh": true,
+          "source": "https://docs.github.com/en/codespaces/developing-in-a-codespace/using-github-codespaces-with-github-cli"
+        },
+        "git": {
+          "value": "GitHub only",
+          "source": "https://docs.github.com/en/codespaces/developing-in-a-codespace/creating-a-codespace-for-a-repository"
+        },
+        "secrets": {
+          "value": "User/repo/org Codespaces secrets",
+          "source": "https://docs.github.com/en/codespaces/managing-your-codespaces/managing-your-account-specific-secrets-for-github-codespaces"
+        },
+        "network": {
+          "value": "Private/org/public forwarded ports; no egress allowlist documented",
+          "source": "https://docs.github.com/en/codespaces/developing-in-a-codespace/forwarding-ports-in-your-codespace"
+        },
+        "byoc": {
+          "value": "No",
+          "source": "https://github.com/features/codespaces"
+        }
+      },
+      "pricing": {
+        "model": "fixed",
+        "summary": "per core-hour while running, plus storage",
+        "cpu_per_vcpu_hour": 0.09,
+        "memory_per_gib_hour": null,
+        "fixed_sizes": [
+          {
+            "name": "2 core",
+            "vcpu": 2,
+            "memory_gib": null,
+            "hourly": 0.18
+          },
+          {
+            "name": "4 core",
+            "vcpu": 4,
+            "memory_gib": null,
+            "hourly": 0.36
+          },
+          {
+            "name": "8 core",
+            "vcpu": 8,
+            "memory_gib": null,
+            "hourly": 0.72
+          },
+          {
+            "name": "16 core",
+            "vcpu": 16,
+            "memory_gib": null,
+            "hourly": 1.44
+          },
+          {
+            "name": "32 core",
+            "vcpu": 32,
+            "memory_gib": null,
+            "hourly": 2.88
+          }
+        ],
+        "storage_per_gb_month": 0.07,
+        "storage": "$0.07/GB-month",
+        "plan_fee": "None",
+        "free_tier": "Personal: 120 core-hours + 15 GB-month/mo (Pro: 180 + 20); none for orgs",
+        "raw_quotes": [
+          "| Codespaces compute | 2 core | 1 hour | 2 | $0.18 |",
+          "| Codespaces compute | 4 core | 1 hour | 4 | $0.36 |",
+          "| Codespaces storage | Storage | 1 GB-month | Not applicable | $0.07 |",
+          "GitHub plans for organizations and enterprises do not include a free quota for GitHub Codespaces."
+        ],
+        "published_checks": [
+          {
+            "label": "2 core $0.18/hr",
+            "vcpu": 2,
+            "memory_gib": 4,
+            "hourly": 0.18
+          },
+          {
+            "label": "4 core $0.36/hr",
+            "vcpu": 4,
+            "memory_gib": 4,
+            "hourly": 0.36
+          }
+        ],
+        "sources": [
+          "https://docs.github.com/en/billing/concepts/product-billing/github-codespaces"
+        ]
+      },
+      "open_questions": [
+        "RAM per machine type isn't listed on GitHub's billing or docs pages, so the comparison assumes the 2-core machine fits a 2 vCPU / 4 GiB workload.",
+        "The 12-hour maximum lifetime means always-on agents must be restarted at least twice a day."
+      ]
+    },
+    {
+      "id": "ona",
+      "name": "Ona (formerly Gitpod)",
+      "category": "cloud-dev-environment",
+      "website": "https://ona.com",
+      "docs_url": "https://ona.com/docs/ona/getting-started",
+      "pricing_url": "https://ona.com/pricing",
+      "last_verified": "2026-10-19",
+      "summary": "VM-based dev environments with a built-in Codex agent, on Ona Cloud or on Enterprise runners in your AWS/GCP account. New customer signups and new Core subscriptions are closed.",
+      "features": {
+        "agents": {
+          "value": "Codex agent built in; Claude Code etc. inside environments",
+          "bring_your_own": true,
+          "quote": "Codex Agent runs the open-source Codex harness in an Ona environment with your project context, environment isolation, integrations, and guardrails.",
+          "source": "https://ona.com/docs/ona/agents/codex"
+        },
+        "environment": {
+          "value": "Dev Container config; Standard 4 vCPU / 16 GB",
+          "source": "https://ona.com/docs/ona/billing/usage"
+        },
+        "isolation": {
+          "value": "VM per environment",
+          "quote": "Environment provisioning: creates isolated VMs from your Dev Container configuration",
+          "source": "https://ona.com/docs/ona/runners/overview"
+        },
+        "api": {
+          "value": "Ona CLI and API",
+          "source": "https://ona.com/docs/ona/environments/agent-environments"
+        },
+        "persistence": {
+          "value": "Yes; archived after 3 days stopped (Core)",
+          "source": "https://ona.com/docs/ona/environments/archive-auto-delete"
+        },
+        "idle": {
+          "value": "Auto-stop after 30 min (configurable)",
+          "source": "https://ona.com/docs/ona/organizations/policies/environment-timeout"
+        },
+        "max_session": {
+          "value": "No published limit",
+          "source": "https://ona.com/docs/ona/organizations/policies/environment-timeout"
+        },
+        "concurrency": {
+          "value": null,
+          "source": "https://ona.com/docs/ona/automations/plans-and-limits"
+        },
+        "access": {
+          "value": "Browser VS Code, VS Code, Cursor, JetBrains, SSH",
+          "web_terminal": true,
+          "ssh": true,
+          "source": "https://ona.com/docs/ona/editors/overview"
+        },
+        "git": {
+          "value": "GitHub, GitLab, Bitbucket, Azure DevOps",
+          "source": "https://ona.com/docs/ona/source-control/overview"
+        },
+        "secrets": {
+          "value": "Org/project/user secrets",
+          "source": "https://ona.com/docs/ona/configuration/secrets/overview"
+        },
+        "network": {
+          "value": "Standard on Ona Cloud; full (PrivateLink, VPN) on customer VPC",
+          "source": "https://ona.com/docs/ona/runners/overview"
+        },
+        "byoc": {
+          "value": "Enterprise: runners in your AWS or GCP",
+          "source": "https://ona.com/docs/ona/runners/overview"
+        }
+      },
+      "pricing": {
+        "model": "usage-credits",
+        "summary": "Enterprise via sales, billed in credits; legacy Core plan billed in OCUs (price per OCU not published); new signups closed",
+        "short": "Enterprise via sales (credits)",
+        "storage": "not published",
+        "plan_fee": "Contact sales",
+        "free_tier": "None (new signups closed)",
+        "raw_quotes": [
+          "| Standard | 4 vCPUs / 16GB RAM | 1 OCU/hour |",
+          "New Core subscriptions are no longer available. Existing Core subscriptions remain supported.",
+          "New customer signup is closed. Existing customers and new members joining existing organizations can continue using Ona.",
+          "In Enterprise, usage is billed in credits rather than OCUs."
+        ],
+        "sources": [
+          "https://ona.com/docs/ona/billing/usage",
+          "https://ona.com/docs/ona/billing/overview",
+          "https://ona.com/docs/ona/getting-started"
+        ]
+      },
+      "open_questions": [
+        "The site header says 'Part of OpenAI'. The terms and timing aren't documented on the pages checked.",
+        "The dollar price per OCU is not published."
+      ]
+    },
+    {
+      "id": "coder",
+      "name": "Coder",
+      "category": "cloud-dev-environment",
+      "website": "https://coder.com",
+      "docs_url": "https://coder.com/docs",
+      "pricing_url": "https://coder.com/pricing",
+      "last_verified": "2026-10-19",
+      "summary": "Self-hosted, open-source (AGPL-3.0) platform for Terraform-defined workspaces on your own infrastructure. It can run Claude Code, Codex or any terminal agent, plus its own Coder Agents.",
+      "features": {
+        "agents": {
+          "value": "Claude Code, Codex, any terminal agent; Coder Agents",
+          "bring_your_own": true,
+          "quote": "Template admins can install terminal-based coding agents, such as Claude Code or Codex, directly into a workspace template using a registry module.",
+          "source": "https://coder.com/docs/ai-coder"
+        },
+        "environment": {
+          "value": "Terraform templates (VMs, Kubernetes pods, Docker)",
+          "source": "https://coder.com/docs"
+        },
+        "isolation": {
+          "value": "Whatever your template provisions",
+          "quote": "Templates describe the infrastructure for each workspace, from EC2 VMs and Kubernetes Pods to Docker containers.",
+          "source": "https://coder.com/docs/about"
+        },
+        "api": {
+          "value": "REST API, CLI, Terraform",
+          "source": "https://coder.com/docs"
+        },
+        "persistence": {
+          "value": "Defined by template",
+          "source": "https://coder.com/docs/admin/templates/managing-templates/schedule"
+        },
+        "idle": {
+          "value": "Template autostop / inactivity timeout",
+          "source": "https://coder.com/docs/user-guides/workspace-scheduling"
+        },
+        "max_session": {
+          "value": "No platform limit",
+          "source": "https://coder.com/docs/admin/templates/managing-templates/schedule"
+        },
+        "concurrency": {
+          "value": "Unlimited workspaces; 5 active Coder Agents on Community",
+          "source": "https://coder.com/docs/ai-coder/agents/licensing-usage"
+        },
+        "access": {
+          "value": "Web terminal, SSH, VS Code, JetBrains, Cursor",
+          "web_terminal": true,
+          "ssh": true,
+          "source": "https://coder.com/docs/user-guides/workspace-access"
+        },
+        "git": {
+          "value": "Any provider (external auth)",
+          "source": "https://coder.com/docs/admin/external-auth"
+        },
+        "secrets": {
+          "value": "User secrets, Vault integration",
+          "source": "https://coder.com/docs/user-guides/user-secrets"
+        },
+        "network": {
+          "value": "Your infrastructure; Agent Firewall (Premium)",
+          "source": "https://coder.com/docs/ai-coder/agent-firewall"
+        },
+        "byoc": {
+          "value": "Self-hosted only",
+          "source": "https://coder.com/docs/install"
+        }
+      },
+      "pricing": {
+        "model": "self-hosted",
+        "summary": "Community edition free (AGPL); Premium per-user licence (price not published); compute is your own cloud bill",
+        "short": "Free (open source) or per-user licence, plus your cloud",
+        "storage": "Your cloud provider",
+        "plan_fee": "Community free; Premium per user (not published)",
+        "free_tier": "Community edition (open source)",
+        "raw_quotes": [
+          "Community Free For hobbyists and small teams ready to join Coder's open-source community.",
+          "Premium Annually per user"
+        ],
+        "sources": [
+          "https://coder.com/pricing",
+          "https://coder.com/docs/ai-coder/agents/licensing-usage"
+        ]
+      },
+      "open_questions": [
+        "Coder Tasks was removed in v2.34. Older comparisons that mention it are out of date.",
+        "You operate the control plane and the infrastructure yourself."
+      ]
+    },
+    {
+      "id": "e2b",
+      "name": "E2B",
+      "category": "sandbox-platform",
+      "website": "https://e2b.dev",
+      "docs_url": "https://docs.e2b.dev",
+      "pricing_url": "https://e2b.dev/pricing",
+      "last_verified": "2026-10-19",
+      "summary": "Firecracker microVM sandboxes controlled through an SDK, API or CLI, with prebuilt templates for Claude Code, Codex, Amp and OpenCode.",
+      "features": {
+        "agents": {
+          "value": "Templates: Claude Code, Codex, Amp, OpenCode; any agent",
+          "bring_your_own": true,
+          "quote": "E2B provides a pre-built `claude` template with Claude Code already installed.",
+          "source": "https://docs.e2b.dev/agents/claude-code"
+        },
+        "environment": {
+          "value": "Custom templates; 10 GiB disk (Hobby), 20 GiB (Pro)",
+          "source": "https://docs.e2b.dev/billing"
+        },
+        "isolation": {
+          "value": "Firecracker microVM",
+          "source": "https://docs.e2b.dev/faq/security-and-compliance"
+        },
+        "api": {
+          "value": "JS/Python SDK, REST API, CLI",
+          "source": "https://docs.e2b.dev/agents/claude-code"
+        },
+        "persistence": {
+          "value": "Opt-in pause/resume; paused kept indefinitely",
+          "source": "https://docs.e2b.dev/sandbox/persistence"
+        },
+        "idle": {
+          "value": "Killed after 5 min timeout by default (can pause instead)",
+          "quote": "Every sandbox has a timeout, and it defaults to **5 minutes** if you do not set one.",
+          "source": "https://docs.e2b.dev/faq/sandbox-lifetime"
+        },
+        "max_session": {
+          "value": "1 h (Hobby) / 24 h (Pro) continuous; pausing resets",
+          "source": "https://docs.e2b.dev/billing"
+        },
+        "concurrency": {
+          "value": "20 (Hobby); 100–1,100 (Pro with add-ons)",
+          "source": "https://docs.e2b.dev/billing"
+        },
+        "access": {
+          "value": "SDK terminal (PTY); SSH via custom template + proxy",
+          "web_terminal": null,
+          "ssh": true,
+          "source": "https://docs.e2b.dev/sandbox/ssh-access"
+        },
+        "git": {
+          "value": "Via commands in the sandbox",
+          "source": "https://docs.e2b.dev/sandbox/git-integration"
+        },
+        "secrets": {
+          "value": "Secrets store injected by egress proxy; env vars",
+          "source": "https://docs.e2b.dev/secrets"
+        },
+        "network": {
+          "value": "Internet on/off, CIDR/hostname allow and deny lists",
+          "source": "https://docs.e2b.dev/sandbox/internet-access"
+        },
+        "byoc": {
+          "value": "Enterprise only (AWS, GCP, Azure)",
+          "source": "https://docs.e2b.dev/byoc"
+        }
+      },
+      "pricing": {
+        "model": "allocated",
+        "summary": "per second for allocated vCPU and RAM",
+        "cpu_per_vcpu_hour": 0.0504,
+        "memory_per_gib_hour": 0.0162,
+        "storage": "Disk included; paused storage pricing not published",
+        "plan_fee": "Hobby $0; Pro $150/mo (needed for >1 h sessions or >20 concurrent)",
+        "free_tier": "One-time $100 credit",
+        "raw_quotes": [
+          "vCPUs 1 Hobby / Pro $0.000014/s",
+          "Memory (GiB) 1 Hobby / Pro $0.0000045/s",
+          "You pay per second for compute resources while your sandbox is running."
+        ],
+        "published_checks": [
+          {
+            "label": "E2B calculator: 2 vCPU / 4 GiB ≈ $0.1656/hr",
+            "vcpu": 2,
+            "memory_gib": 4,
+            "hourly": 0.1656
+          }
+        ],
+        "sources": [
+          "https://e2b.dev/pricing",
+          "https://docs.e2b.dev/billing"
+        ]
+      },
+      "open_questions": [
+        "Storage for paused sandboxes isn't priced on the billing page, so it's counted as $0 here.",
+        "Always-on use needs Pro and pause/resume every 24 h, or Enterprise."
+      ]
+    },
+    {
+      "id": "daytona",
+      "name": "Daytona",
+      "category": "sandbox-platform",
+      "website": "https://www.daytona.io",
+      "docs_url": "https://www.daytona.io/docs",
+      "pricing_url": "https://www.daytona.io/pricing",
+      "last_verified": "2026-10-19",
+      "summary": "Persistent sandboxes (containers by default, optional VMs) managed by SDK, API or CLI. The default snapshot preinstalls Claude Code, Codex and OpenCode.",
+      "features": {
+        "agents": {
+          "value": "Claude Code, Codex, OpenCode preinstalled; any agent",
+          "bring_your_own": true,
+          "quote": "The default Daytona snapshot includes Claude Code, so the command above is all you need.",
+          "source": "https://www.daytona.io/docs/en/guides/claude/claude-code-run-cli-sandbox"
+        },
+        "environment": {
+          "value": "Snapshots (images); default 1 vCPU / 1 GB, max 4 vCPU / 8 GB per sandbox by default",
+          "source": "https://www.daytona.io/docs/en/sandboxes"
+        },
+        "isolation": {
+          "value": "Container by default; optional VM",
+          "source": "https://www.daytona.io/docs/en/isolation"
+        },
+        "api": {
+          "value": "Python/TS/Go/Java/Ruby SDKs, REST API, CLI",
+          "source": "https://www.daytona.io/docs/en/guides/claude/claude-code-run-cli-sandbox"
+        },
+        "persistence": {
+          "value": "Yes by default; archived after 7 days stopped",
+          "quote": "Daytona sandboxes are persistent by default.",
+          "source": "https://www.daytona.io/docs/en/persistence"
+        },
+        "idle": {
+          "value": "Containers auto-stop after 15 min idle; VMs auto-pause after 60 min (defaults)",
+          "source": "https://www.daytona.io/docs/en/sandboxes#auto-stop-interval"
+        },
+        "max_session": {
+          "value": "No limit (auto-stop can be disabled)",
+          "source": "https://www.daytona.io/docs/en/sandboxes"
+        },
+        "concurrency": {
+          "value": "Tiered vCPU/RAM pools (Tier 1: 10 vCPU)",
+          "source": "https://www.daytona.io/docs/en/limits"
+        },
+        "access": {
+          "value": "Web terminal, SSH, VS Code / JetBrains over SSH",
+          "web_terminal": true,
+          "ssh": true,
+          "source": "https://www.daytona.io/docs/en/ssh-access"
+        },
+        "git": {
+          "value": "SDK git operations (clone, commit, push)",
+          "source": "https://www.daytona.io/docs/en/git-operations"
+        },
+        "secrets": {
+          "value": "Org secrets swapped in by outbound proxy",
+          "source": "https://www.daytona.io/docs/en/secrets"
+        },
+        "network": {
+          "value": "Restricted on Tier 1–2; allowlists/block-all on Tier 3–4",
+          "source": "https://www.daytona.io/docs/en/network-limits"
+        },
+        "byoc": {
+          "value": "Bring your own compute (custom regions)",
+          "source": "https://www.daytona.io/docs/en/bring-your-own-compute"
+        }
+      },
+      "pricing": {
+        "model": "allocated",
+        "summary": "per second for allocated vCPU and RAM, plus disk over 5 GiB",
+        "cpu_per_vcpu_hour": 0.0504,
+        "memory_per_gib_hour": 0.0162,
+        "storage_per_gb_month": 0.07884,
+        "storage_free_gb": 5,
+        "storage": "First 5 GiB free, then $0.000108/GiB-hr (~$0.079/GiB-mo)",
+        "plan_fee": "None (prepaid credits)",
+        "free_tier": "$200 credit",
+        "raw_quotes": [
+          "CPU $0.0504/vCPU-hr and memory $0.0162/GiB-hr, per second (as verified 2026-10-14 in agent-sandbox-pricing)"
+        ],
+        "published_checks": [
+          {
+            "label": "2 vCPU / 4 GiB at published unit rates",
+            "vcpu": 2,
+            "memory_gib": 4,
+            "hourly": 0.1656
+          }
+        ],
+        "sources": [
+          "https://www.daytona.io/pricing",
+          "https://www.daytona.io/docs/en/billing"
+        ]
+      },
+      "open_questions": [
+        "Disk is billed while the sandbox exists until it's archived (after 7 days stopped by default). Here it's priced for the full month.",
+        "Linux VM sandbox pricing isn't published (Windows VMs are listed at $0.0858/vCPU/h); container pricing is used here."
+      ]
+    },
+    {
+      "id": "sprites",
+      "name": "Sprites (Fly.io)",
+      "category": "sandbox-platform",
+      "website": "https://sprites.dev",
+      "docs_url": "https://docs.fly.io/sprites",
+      "pricing_url": "https://fly.io/sprites",
+      "last_verified": "2026-10-19",
+      "summary": "Persistent, hardware-isolated Linux VMs from Fly.io that pause after about 30 s idle and are billed on actual CPU and memory use, with the Claude, Codex, Gemini and Cursor CLIs preinstalled.",
+      "features": {
+        "agents": {
+          "value": "Claude Code, Codex, Gemini CLI, Cursor preinstalled; any agent",
+          "bring_your_own": true,
+          "quote": "AI/CLI Tools: Claude CLI, Gemini CLI, OpenAI Codex, Cursor",
+          "source": "https://docs.fly.io/sprites/working-with-sprites"
+        },
+        "environment": {
+          "value": "Ubuntu 25.10, 100 GB volume",
+          "source": "https://docs.fly.io/sprites/working-with-sprites"
+        },
+        "isolation": {
+          "value": "Hardware-isolated VM",
+          "quote": "Sprites are persistent, hardware-isolated Linux environments for running arbitrary code.",
+          "source": "https://docs.fly.io/sprites"
+        },
+        "api": {
+          "value": "REST/WebSocket API, SDKs, `sprite` CLI, MCP",
+          "source": "https://docs.fly.io/sprites/integrations/index"
+        },
+        "persistence": {
+          "value": "Yes: disk persists; checkpoints",
+          "quote": "The split is simple: disk persists, memory does not.",
+          "source": "https://docs.fly.io/sprites/concepts/lifecycle"
+        },
+        "idle": {
+          "value": "Pauses after ~30 s idle; no compute charge",
+          "source": "https://docs.fly.io/sprites/concepts/lifecycle"
+        },
+        "max_session": {
+          "value": "No limit (persistent); task holds up to 1 h, renewable",
+          "source": "https://docs.fly.io/sprites/keeping-sprites-running"
+        },
+        "concurrency": {
+          "value": "Per-plan (Hero: 100 running)",
+          "source": "https://fly.io/sprites"
+        },
+        "access": {
+          "value": "`sprite console` shell; no built-in SSH",
+          "web_terminal": null,
+          "ssh": false,
+          "source": "https://docs.fly.io/sprites/working-with-sprites"
+        },
+        "git": {
+          "value": "git preinstalled; GitHub connector",
+          "source": "https://docs.fly.io/sprites/concepts/connectors"
+        },
+        "secrets": {
+          "value": "Connectors via API gateway (agent never sees token)",
+          "source": "https://docs.fly.io/sprites/concepts/connectors"
+        },
+        "network": {
+          "value": "Opt-in DNS allow/deny policy",
+          "source": "https://docs.fly.io/sprites/concepts/networking"
+        },
+        "byoc": {
+          "value": "No",
+          "source": "https://fly.io/sprites"
+        }
+      },
+      "pricing": {
+        "model": "usage",
+        "summary": "CPU and memory actually used, hourly",
+        "cpu_per_vcpu_hour": 0.0385,
+        "memory_per_gib_hour": 0.021875,
+        "storage_per_gb_month": 0.01971,
+        "storage_per_gb_hour_running": 0.000683,
+        "storage": "Hot $0.000683/GB-hr while awake; cold $0.000027/GB-hr while kept",
+        "plan_fee": "Pay-as-you-go; optional plans (e.g. Hero $100/mo)",
+        "free_tier": "$30 trial credit",
+        "raw_quotes": [
+          "CPU Time Cumulative CPU usage measured by cpu.stat $0.0385 /CPU-hour",
+          "Memory Time Actual memory usage $0.021875 /GB-hour",
+          "All resources are billed hourly, based on actual usage."
+        ],
+        "sources": [
+          "https://fly.io/sprites"
+        ]
+      },
+      "open_questions": [
+        "Billing is on measured usage. This comparison assumes the full stated memory is used, with CPU at each scenario's utilisation, which can overstate Sprites' cost for light workloads.",
+        "Auto-pause after ~30 s idle can make real bills much lower than the running-hours assumptions here."
+      ]
+    },
+    {
+      "id": "modal",
+      "name": "Modal Sandboxes",
+      "category": "sandbox-platform",
+      "website": "https://modal.com",
+      "docs_url": "https://modal.com/docs/guide/sandboxes",
+      "pricing_url": "https://modal.com/pricing",
+      "last_verified": "2026-10-19",
+      "summary": "gVisor- or VM-isolated containers created from Modal's Python, JavaScript or Go SDK for running agent-generated code, billed per second at Sandbox-specific CPU and memory rates, with official examples for running Claude Code and OpenCode.",
+      "features": {
+        "agents": {
+          "value": "Any agent you install; official Claude Code and OpenCode examples",
+          "detail": "Any agent you install in the image. Official examples cover Claude Code, OpenCode, Cursor Cloud Agents, the Claude Agent SDK, LangGraph and Claude Managed Agents.",
+          "source": "https://modal.com/docs/examples/sandbox_agent",
+          "quote": "This example demonstrates how to run Claude Code in a Modal Sandbox to analyze a GitHub repository.",
+          "bring_your_own": true
+        },
+        "environment": {
+          "value": "Any image via `modal.Image` or a registry",
+          "detail": "Custom images built with modal.Image (e.g. debian_slim().pip_install), plus existing registry images and named Images.",
+          "source": "https://modal.com/docs/guide/sandboxes",
+          "quote": "Run containers with arbitrary dependencies and setup scripts."
+        },
+        "isolation": {
+          "value": "gVisor or VM runtime (Modal picks if unset)",
+          "detail": "Sandboxes run on gVisor or in a VM with its own Linux kernel (supporting Docker-in-Sandbox, FUSE and nested cgroups). You choose with the runtime parameter, or leave it unset and Modal chooses.",
+          "source": "https://modal.com/docs/guide/sandboxes",
+          "quote": "Sandboxes run on one of two runtimes: gVisor , a container runtime developed by Google, provides strong isolation and is suitable for most workloads. VMs run the Sandbox in a virtual machine with its own Linux kernel."
+        },
+        "api": {
+          "value": "Python SDK; JavaScript and Go SDKs (beta); CLI",
+          "detail": "Python SDK (sync and async), JavaScript and Go SDKs (Beta), modal CLI",
+          "source": "https://modal.com/docs/guide/sandboxes",
+          "quote": "JavaScript/Go SDKs Beta"
+        },
+        "persistence": {
+          "value": "Volumes; filesystem snapshots (30-day default TTL)",
+          "detail": "Volumes can be mounted. Filesystem and Directory Snapshots are kept 30 days by default (TTL configurable, or no expiry). Memory Snapshots are Alpha and expire after 7 days.",
+          "source": "https://modal.com/docs/guide/sandbox-snapshots",
+          "quote": "Modal currently supports three different kinds of Sandbox snapshots: Filesystem Snapshots Directory Snapshots Memory Snapshots"
+        },
+        "idle": {
+          "value": "Optional `idle_timeout` terminates the sandbox",
+          "detail": "Optional idle_timeout. A Sandbox counts as active while an exec command runs, stdin is being written, or a Tunnel has an open TCP connection.",
+          "source": "https://modal.com/docs/guide/sandboxes",
+          "quote": "Sandboxes can also be automatically terminated after a period of inactivity - you can do this by setting the idle_timeout parameter."
+        },
+        "max_session": {
+          "value": "5 min default, up to 24 h; snapshot to continue",
+          "detail": "5 min default, up to 24 h. For longer work, snapshot and restore into a new Sandbox.",
+          "source": "https://modal.com/docs/guide/sandboxes",
+          "quote": "Sandboxes have a default maximum lifetime of 5 minutes. You can change this by passing a timeout of up to 24 hours to the Sandbox.create(...) function."
+        },
+        "concurrency": {
+          "value": "Starter 100 / Team 5,000 containers",
+          "detail": "Up to 50,000 concurrent sandboxes per customer (Modal engineering blog). The plan table lists 100 containers on Starter and 5,000 on Team.",
+          "source": "https://modal.com/blog/scaling-to-1-million-concurrent-sandboxes-in-seconds",
+          "quote": "supports up to fifty thousand concurrent sandboxes per customer"
+        },
+        "access": {
+          "value": "`modal shell`, exec with PTY, Tunnels; no SSH",
+          "detail": "sandbox.exec (with PTY), Tunnels for exposing ports, and `modal shell <sandbox-id>` for an interactive shell. No SSH or browser web terminal is documented.",
+          "source": "https://modal.com/docs/reference/cli/shell",
+          "quote": "Connect to a running Sandbox by ID: modal shell sb-abc123xyz",
+          "web_terminal": null,
+          "ssh": null
+        },
+        "git": {
+          "value": "None built in; clone inside the sandbox",
+          "detail": "No built-in git integration. Examples run git clone inside the Sandbox or at image build time, using a GitHub token for private repos.",
+          "source": "https://modal.com/docs/guide/sandboxes",
+          "quote": "Check out a git repository and run a command against it, like a test suite, or npm lint ."
+        },
+        "secrets": {
+          "value": "`modal.Secret`",
+          "detail": "modal.Secret (from_name / from_dict) is passed to Sandbox.create or exec. Secret injection into outbound request headers is in Beta.",
+          "source": "https://modal.com/docs/guide/sandboxes",
+          "quote": "You can set environment variables using inline secrets"
+        },
+        "network": {
+          "value": "`block_network`, CIDR and domain allowlists (beta)",
+          "detail": "Outbound is open by default. Options are block_network=True, outbound_cidr_allowlist and outbound_domain_allowlist (Beta, TLS on port 443 only). DNS is not restricted unless the network is fully blocked. Inbound connections are not accepted by default.",
+          "source": "https://modal.com/docs/guide/sandbox-networking",
+          "quote": "Full block block_network=True Drops all outbound traffic. IP-range allowlist outbound_cidr_allowlist Only allows traffic to the listed CIDR ranges (any protocol). Domain allowlist (Beta) outbound_domain_allowlist"
+        },
+        "byoc": {
+          "value": "No (not published)",
+          "detail": "Not published. Modal runs on its own multi-cloud capacity pool, and the AWS/GCP marketplace option is for purchasing only.",
+          "source": "https://modal.com/pricing",
+          "quote": "Transact through the AWS and GCP marketplace to use committed spend on Modal."
+        }
+      },
+      "pricing": {
+        "model": "allocated",
+        "summary": "per second, on the higher of requested and used CPU and memory, at Sandbox rates",
+        "cpu_per_vcpu_hour": 0.070956,
+        "memory_per_gib_hour": 0.024012,
+        "storage_per_gb_month": 0.09,
+        "storage_free_gb": 1024,
+        "storage": "Volumes $0.09/GiB-mo, 1 TiB/mo free; egress $0.04/GiB",
+        "plan_fee": "Starter $0/mo; Team $250/mo",
+        "free_tier": "$30/mo credits (Starter), $100/mo (Team)",
+        "raw_quotes": [
+          "Modal Sandbox + Notebooks pricing Only pay for what you use.",
+          "CPU Physical core (2 vCPU equivalent) $ 0.00003942 / core / sec *minimum of 0.125 cores per container",
+          "Memory $ 0.00000667 / GiB / sec",
+          "Standard (Functions): CPU $ 0.0000131 / core / sec Physical core (2 vCPU equivalent)",
+          "Standard (Functions): Memory $ 0.00000222 / GiB / sec",
+          "Volumes $ 0.09 / GiB / mo *includes 1 TiB / mo free",
+          "Network Egress $ 0.04 / GiB",
+          "Starter ... $0 + compute / month $30 / month free credits 3 workspace seats included 100 containers + 10 GPU concurrency",
+          "Team ... $250 + compute / month $100 / month free credits Unlimited seats 5000 containers + 50 GPU concurrency",
+          "Note that each physical core is equivalent to 2 vCPUs as offered by AWS or GCP.",
+          "Modal Sandboxes are billed by the second based on whichever is higher: your resource request or your actual usage. ... You pay for max(request, actual) ."
+        ],
+        "published_checks": [
+          {
+            "label": "1 physical core (2 vCPU) at the published Sandbox rate, no memory",
+            "vcpu": 2,
+            "memory_gib": 0,
+            "hourly": 0.141912
+          },
+          {
+            "label": "4 GiB memory at the published Sandbox rate",
+            "vcpu": 0,
+            "memory_gib": 4,
+            "hourly": 0.096048
+          }
+        ],
+        "conversion_note": "Modal prices CPU per physical core per second, and 1 core = 2 vCPU ('The cpu parameter specifies physical CPU cores (1 core = 2 vCPUs)', https://modal.com/docs/guide/sandbox-resources). Sandbox CPU: $0.00003942/core/s x 3600 = $0.141912/core-hour, divided by 2 = $0.070956/vCPU-hour. Sandbox memory: $0.00000667/GiB/s x 3600 = $0.024012/GiB-hour. For comparison, standard Function rates are $0.04716/core-hour ($0.02358/vCPU-hour) and $0.007992/GiB-hour. Billing is max(request, usage), so the request acts as a floor, with a minimum request of 0.125 core and 128 MiB. Storage is quoted per GiB-month and is used here as per GB-month without conversion. Region selection costs 1.15-1.75x and non-preemptible execution 3x base prices; it is not stated whether these multipliers apply to Sandbox rates.",
+        "sources": [
+          "https://modal.com/pricing",
+          "https://modal.com/docs/guide/sandbox-resources",
+          "https://modal.com/docs/guide/sandboxes"
+        ]
+      },
+      "coding_agent_examples": [
+        {
+          "title": "Run Claude Code in a Modal Sandbox",
+          "url": "https://modal.com/docs/examples/sandbox_agent"
+        },
+        {
+          "title": "Run OpenCode in a Modal Sandbox (background coding agent)",
+          "url": "https://modal.com/docs/examples/opencode_server"
+        },
+        {
+          "title": "Run Cursor Cloud Agents on Modal",
+          "url": "https://modal.com/docs/examples/cursor"
+        },
+        {
+          "title": "Introducing Claude Managed Agents with Modal Sandboxes (blog, May 19, 2026)",
+          "url": "https://modal.com/blog/introducing-claude-managed-agents-with-modal-sandboxes"
+        },
+        {
+          "title": "claude-managed-agents-modal-sandbox (modal-labs GitHub)",
+          "url": "https://github.com/modal-labs/claude-managed-agents-modal-sandbox"
+        },
+        {
+          "title": "Self-hosted Claude Code environments using Modal Sandboxes (modal-projects GitHub)",
+          "url": "https://github.com/modal-projects/claude-code-modal-environments"
+        },
+        {
+          "title": "Build a scalable AI coding platform (Modal Vibe)",
+          "url": "https://modal.com/docs/examples/modal-vibe"
+        },
+        {
+          "title": "Build a coding agent with Modal Sandboxes and LangGraph",
+          "url": "https://modal.com/docs/examples/agent"
+        },
+        {
+          "title": "Create GIFs from Slack using the Claude Agent SDK",
+          "url": "https://modal.com/docs/examples/claude-slack-gif-creator"
+        }
+      ],
+      "open_questions": [
+        "Modal prices CPU per physical core; 1 core = 2 vCPU per Modal's docs, so the per-vCPU rate here is the per-core rate halved.",
+        "Billing is max(request, actual usage), so it is modelled like allocated pricing: the request is the floor. A sandbox using more than it requests costs more.",
+        "Sandbox rates are about 3x Modal's standard Function rates ($0.0000131/core/s and $0.00000222/GiB/s); only Sandbox rates are used here.",
+        "Sandboxes run for at most 24 hours. The always-on scenario assumes you snapshot and restore into a new sandbox every 24 hours, which Modal documents but which isn't free of effort.",
+        "The 1 TiB/month free Volume allowance is applied per environment here; if it is per workspace (account), large teams may pay for storage sooner.",
+        "No official Codex CLI example was found in Modal docs or examples.",
+        "Unclear whether the plan container limits (Starter 100, Team 5000) cap concurrent Sandboxes; the blog cites up to 50,000 concurrent sandboxes per customer.",
+        "No SSH or browser-based web terminal is documented for Sandboxes; only `modal shell <sandbox-id>`, exec with PTY, and Tunnels.",
+        "Not stated whether region-selection (1.15-1.75x) or non-preemptible (3x) multipliers apply to Sandbox CPU/memory rates.",
+        "Storage pricing for retained snapshots (filesystem/directory/memory) is not published separately from Volumes.",
+        "Pricing for the VM runtime or nested virtualization (Team/Enterprise) is not separately itemized on the pricing page.",
+        "BYOC (running Modal Sandboxes in a customer's own cloud account) is not mentioned in official docs or pricing."
+      ]
+    }
+  ]
+}

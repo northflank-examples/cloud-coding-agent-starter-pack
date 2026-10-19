@@ -1,0 +1,3167 @@
+{
+  "schema_version": 1,
+  "last_updated": "2026-10-19",
+  "northflank_harness": {
+    "type_enum": [
+      "codex",
+      "claude",
+      "pi",
+      "omp",
+      "devin",
+      "opencode",
+      "cursor",
+      "none"
+    ],
+    "type_quote": "`type`: (string) (required) The harness environment type to run. (enum: codex, claude, pi, omp, devin, opencode, cursor, none)",
+    "auth_quote": "`authMode`: (string) How Codex, Claude and Cursor authenticate. Pi, OMP, Devin CLI and OpenCode require `account`; agentless harnesses omit this field. When omitted for Codex, Claude or Cursor, `apiKey` is inferred if an apiKey is provided. (enum: apiKey, account)",
+    "source": "https://northflank.com/docs/v1/api/project/harnesses/create-harness",
+    "byoa_quote": "Yes. Bring Your Own Agent lets you configure a Harness for a CLI-based coding agent that is not on the default list. You install and configure the agent in the Harness, which provides the same microVM isolation, workspace persistence, and access options available to other Harnesses.",
+    "byoa_source": "https://northflank.com/blog/how-to-run-multiple-coding-agents-in-parallel",
+    "agents_quote": "Any coding agent: Harnesses for Claude Code, Codex, Cursor, OpenCode, and Pi, plus Bring Your Own Agent for other agents and an empty sandbox with no agent installed.",
+    "agents_source": "https://northflank.com/blog/best-cloud-environments-for-ai-coding-agents"
+  },
+  "agents": [
+    {
+      "id": "claude-code",
+      "name": "Claude Code",
+      "vendor": "Anthropic",
+      "binary": "claude",
+      "summary": "Anthropic's terminal coding agent.",
+      "homepage": "https://www.claude.com/product/claude-code",
+      "docs": "https://code.claude.com/docs/en/overview",
+      "repo": "https://github.com/anthropics/claude-code",
+      "license": {
+        "value": "Proprietary",
+        "open_source": false,
+        "quote": "© Anthropic PBC. All rights reserved. Use is subject to Anthropic's Commercial Terms of Service.",
+        "source": "https://github.com/anthropics/claude-code/blob/main/LICENSE.md"
+      },
+      "latest_version_checked": "2.1.301",
+      "install": [
+        {
+          "label": "Install script",
+          "command": "curl -fsSL https://claude.ai/install.sh | bash",
+          "requirements": null,
+          "quote": "Native installations automatically update in the background to keep you on the latest version.",
+          "source": "https://code.claude.com/docs/en/setup"
+        },
+        {
+          "label": "npm",
+          "command": "npm install -g @anthropic-ai/claude-code",
+          "requirements": "Node.js 22+",
+          "quote": "The npm package requires Node.js 22 or later.",
+          "source": "https://code.claude.com/docs/en/setup"
+        }
+      ],
+      "headless_doc": {
+        "value": "claude -p \"<task>\"",
+        "detail": "claude -p \"<prompt>\"",
+        "notes": "Prints the response to stdout and exits. Exit code 0 on success, non-zero on failure; failures inside the run (e.g. missing auth) are printed as the result on stdout. Reads piped stdin (capped at 10MB). --bare skips hooks, plugins, MCP, CLAUDE.md, auto memory and is recommended for scripts/CI. SIGTERM exits with code 143.",
+        "quote": "Claude Code exits with code 0 on success and a non-zero code when the run fails, so your scripts can branch on the exit status.",
+        "source": "https://code.claude.com/docs/en/headless"
+      },
+      "auto_approve": {
+        "value": "`--permission-mode acceptEdits` plus `--allowedTools`; `--dangerously-skip-permissions` for full bypass (refused as root)",
+        "detail": "--dangerously-skip-permissions (== --permission-mode bypassPermissions). Safer: --allowedTools \"Read,Edit,Bash(git diff *)\", --permission-mode acceptEdits, --permission-mode auto (classifier reviews actions), --permission-mode dontAsk (deny anything not pre-allowed), plus --permission-prompts none for unattended runs.",
+        "notes": "Docs recommend bypassPermissions only in isolated containers/VMs. On Linux/macOS Claude Code refuses --dangerously-skip-permissions when running as root or under sudo (check skipped inside a recognized sandbox); run as a non-root user. Deny rules still apply in bypassPermissions.",
+        "quote": "Run fully unattended inside a container | `claude -p \"<prompt>\" --dangerously-skip-permissions`",
+        "source": "https://code.claude.com/docs/en/permission-modes"
+      },
+      "json_output": {
+        "value": "`--output-format json` or `stream-json`",
+        "detail": "--output-format json (or stream-json with --verbose; --json-schema for structured output)",
+        "quote": "`json`: structured JSON with result, session ID, and metadata",
+        "source": "https://code.claude.com/docs/en/headless"
+      },
+      "resume": {
+        "value": "`--continue` / `--resume <session-id>`",
+        "detail": "--continue / -c (most recent in current dir); --resume / -r <session-id|name>",
+        "quote": "Use `--continue` to continue the most recent conversation, or `--resume` with a session ID to continue a specific conversation.",
+        "source": "https://code.claude.com/docs/en/headless"
+      },
+      "model_flag": {
+        "value": "`--model <alias or name>`",
+        "detail": "--model <alias|full-name> (e.g. sonnet, opus, haiku, fable); env ANTHROPIC_MODEL",
+        "quote": "Sets the model for the current session with a model alias such as `sonnet`, `opus`, `haiku`, or `fable`, or a model's full name.",
+        "source": "https://code.claude.com/docs/en/cli-reference"
+      },
+      "providers": {
+        "value": "Claude models only: Anthropic API or subscription, Amazon Bedrock, Google Vertex AI, Microsoft Foundry, or an Anthropic-compatible gateway",
+        "detail": "Anthropic Claude models only, served via Anthropic API/subscription, Amazon Bedrock, Google Cloud Agent Platform (Vertex AI), Microsoft Foundry, or an Anthropic-compatible gateway via ANTHROPIC_BASE_URL. Not a BYO-any-provider tool.",
+        "quote": "You can also use Claude Code with a third-party API provider like Amazon Bedrock, Google Cloud's Agent Platform, or Microsoft Foundry.",
+        "source": "https://code.claude.com/docs/en/setup"
+      },
+      "instructions_file": {
+        "value": "`CLAUDE.md`; reads `AGENTS.md` only when there's no `CLAUDE.md`",
+        "detail": "CLAUDE.md (./CLAUDE.md or ./.claude/CLAUDE.md, ~/.claude/CLAUDE.md, CLAUDE.local.md). Reads AGENTS.md directly (v2.1.277+) only when no CLAUDE.md/CLAUDE.local.md exists in the working dir or above; otherwise import it with @AGENTS.md.",
+        "quote": "By default, Claude reads `AGENTS.md` only when you have no `CLAUDE.md` in your working directory or above it.",
+        "source": "https://code.claude.com/docs/en/memory"
+      },
+      "config_dir": {
+        "value": "`~/.claude/` and `~/.claude.json`; Linux credentials in `~/.claude/.credentials.json`",
+        "detail": "~/.claude/ (override with CLAUDE_CONFIG_DIR) plus ~/.claude.json; Linux credentials in ~/.claude/.credentials.json (mode 0600); macOS uses Keychain",
+        "quote": "On Linux, credentials are stored in `~/.claude/.credentials.json` with file mode `0600`.",
+        "source": "https://code.claude.com/docs/en/authentication"
+      },
+      "sandbox": {
+        "value": "Optional: bubblewrap on Linux, Seatbelt on macOS (shell commands only)",
+        "detail": "Optional built-in Bash sandbox: Seatbelt on macOS, bubblewrap (+ socat) on Linux/WSL2; enable with /sandbox or settings. Covers shell commands only (not file tools, MCP, hooks). In unprivileged containers set sandbox.enableWeakerNestedSandbox=true.",
+        "quote": "**Linux and WSL2**: the sandbox relies on `bubblewrap` and `socat`",
+        "source": "https://code.claude.com/docs/en/sandboxing"
+      },
+      "mcp": {
+        "value": "Yes: `claude mcp add`, `.mcp.json`, `--mcp-config`",
+        "detail": "Yes. `claude mcp add ...` (e.g. --transport http); project scope in .mcp.json, local/user scope in ~/.claude.json; --mcp-config for one-off runs.",
+        "quote": "Project-scoped servers enable team collaboration by storing configurations in a `.mcp.json` file at your project's root directory.",
+        "source": "https://code.claude.com/docs/en/mcp"
+      },
+      "pricing_note": {
+        "value": "Claude Pro, Max, Team or Enterprise subscription, or pay-per-token API",
+        "detail": "Requires a paid Claude subscription (Pro, Max, Team, Enterprise) or Claude Console API (pay-per-token); free claude.ai plan excluded. Cloud-provider usage billed by that provider.",
+        "quote": "Claude Code requires a Pro, Max, Team, Enterprise, or Console account. The free claude.ai plan does not include Claude Code access.",
+        "source": "https://code.claude.com/docs/en/setup"
+      },
+      "providers_short": "Claude only",
+      "update_env": {
+        "value": "`DISABLE_AUTOUPDATER=1`",
+        "detail": "DISABLE_AUTOUPDATER=1, DISABLE_UPDATES=1, DISABLE_TELEMETRY=1, DISABLE_ERROR_REPORTING=1, or CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1 (covers auto-updates, telemetry, error reporting and more)",
+        "quote": "Set to any non-empty value, such as `1`, to disable nonessential network traffic: auto-updates, telemetry, error reporting",
+        "source": "https://code.claude.com/docs/en/env-vars"
+      },
+      "auth": [
+        {
+          "method": "API key (Claude Console)",
+          "env": [
+            "ANTHROPIC_API_KEY"
+          ],
+          "how": "export ANTHROPIC_API_KEY=sk-ant-...; in -p mode the key is always used when present, no browser needed. Required for --bare mode.",
+          "quote": "In non-interactive mode (`-p`), the key is always used when present.",
+          "source": "https://code.claude.com/docs/en/authentication"
+        },
+        {
+          "method": "Subscription (Pro/Max/Team/Enterprise) long-lived OAuth token",
+          "env": [
+            "CLAUDE_CODE_OAUTH_TOKEN"
+          ],
+          "how": "Run `claude setup-token` on a machine with a browser (one-year token, printed not saved), then export CLAUDE_CODE_OAUTH_TOKEN=<token> on the server. Not read in --bare mode. Can only make model requests (no Remote Control / claude.ai connectors).",
+          "quote": "For CI pipelines, scripts, or other environments where interactive browser login isn't available, generate a one-year OAuth token with `claude setup-token`",
+          "source": "https://code.claude.com/docs/en/authentication"
+        },
+        {
+          "method": "Subscription interactive login over SSH/container",
+          "env": [],
+          "how": "Run `claude`, open the printed login URL in any browser, then paste the code shown back into the terminal at 'Paste code here if prompted'. Credentials saved to ~/.claude/.credentials.json (mode 0600) on Linux.",
+          "quote": "This happens when the browser can't reach Claude Code's local callback server, which is common in WSL2, SSH sessions, and containers.",
+          "source": "https://code.claude.com/docs/en/authentication"
+        },
+        {
+          "method": "Cloud provider (Amazon Bedrock, Google Cloud Agent Platform/Vertex AI, Microsoft Foundry)",
+          "env": [
+            "CLAUDE_CODE_USE_BEDROCK",
+            "CLAUDE_CODE_USE_VERTEX",
+            "CLAUDE_CODE_USE_FOUNDRY"
+          ],
+          "how": "Set the provider env var plus that provider's normal credentials before running claude; no browser login needed.",
+          "quote": "set the required environment variables before running `claude`, or select **3rd-party platform** at the login prompt, which launches an interactive setup wizard for Bedrock and Vertex AI. No browser login is needed.",
+          "source": "https://code.claude.com/docs/en/authentication"
+        },
+        {
+          "method": "LLM gateway / proxy bearer token",
+          "env": [
+            "ANTHROPIC_AUTH_TOKEN",
+            "ANTHROPIC_BASE_URL"
+          ],
+          "how": "Set ANTHROPIC_BASE_URL to the gateway and ANTHROPIC_AUTH_TOKEN to its bearer token.",
+          "quote": "Use this when routing through an LLM gateway or proxy that authenticates with bearer tokens rather than Anthropic API keys.",
+          "source": "https://code.claude.com/docs/en/authentication"
+        }
+      ],
+      "run": {
+        "version": "claude --version",
+        "headless": "claude -p \"<task>\"",
+        "unattended": "claude -p \"Fix the failing tests\" --permission-mode acceptEdits \\\n  --allowedTools \"Read,Edit,Write,Bash\" --output-format json",
+        "explain": [
+          [
+            "-p",
+            "Print mode: run the task without the interactive UI, print the result and exit"
+          ],
+          [
+            "--permission-mode acceptEdits",
+            "File edits don't need approval"
+          ],
+          [
+            "--allowedTools \"Read,Edit,Write,Bash\"",
+            "These tools run without prompting. `Bash` allows any command, so use it only in an isolated environment"
+          ],
+          [
+            "--output-format json",
+            "One JSON object with the result, `session_id` and `total_cost_usd`"
+          ]
+        ]
+      },
+      "container": {
+        "install": "curl -fsSL https://claude.ai/install.sh | bash",
+        "run": "args=(-p \"$prompt\" --permission-mode acceptEdits --allowedTools \"${CLAUDE_ALLOWED_TOOLS:-Read,Edit,Write,Bash}\" --output-format json)\n[[ -n \"${CLAUDE_MAX_BUDGET_USD:-}\" ]] && args+=(--max-budget-usd \"$CLAUDE_MAX_BUDGET_USD\")\nclaude \"${args[@]}\""
+      },
+      "northflank": {
+        "native": true,
+        "harness_type": "claude",
+        "ui_label": "Claude Code",
+        "api_auth": "apiKey or account",
+        "auth": "an Anthropic API key, or sign in with your Claude account in the harness terminal"
+      },
+      "gotchas": [
+        {
+          "text": "--dangerously-skip-permissions is refused when running as root or under sudo on Linux/macOS; create a non-root user in the container",
+          "source": "https://code.claude.com/docs/en/permission-modes"
+        },
+        {
+          "text": "--bare does not read CLAUDE_CODE_OAUTH_TOKEN or OAuth/keychain credentials; use ANTHROPIC_API_KEY or apiKeyHelper with --bare",
+          "source": "https://code.claude.com/docs/en/headless"
+        },
+        {
+          "text": "Without --bare, a -p session runs project hooks and connects .mcp.json servers even in an untrusted folder, with no trust dialog",
+          "source": "https://code.claude.com/docs/en/headless"
+        },
+        {
+          "text": "Login in SSH/containers: browser can't reach the local callback, so paste the code shown in the browser back into the terminal",
+          "source": "https://code.claude.com/docs/en/authentication"
+        },
+        {
+          "text": "Bubblewrap sandbox fails in unprivileged containers ('Can't mount proc'); set enableWeakerNestedSandbox=true only when the container is the isolation boundary",
+          "source": "https://code.claude.com/docs/en/sandboxing"
+        },
+        {
+          "text": "Ubuntu 24.04+ AppArmor blocks bubblewrap user namespaces by default",
+          "source": "https://code.claude.com/docs/en/sandboxing"
+        },
+        {
+          "text": "Alpine/musl requires bash, curl, libgcc, libstdc++, ripgrep and USE_BUILTIN_RIPGREP=0",
+          "source": "https://code.claude.com/docs/en/setup"
+        },
+        {
+          "text": "Native install auto-updates in the background; set DISABLE_AUTOUPDATER or DISABLE_UPDATES to pin versions in images",
+          "source": "https://code.claude.com/docs/en/setup"
+        },
+        {
+          "text": "A -p run may wait up to 10 minutes idle for background work before exiting (CLAUDE_CODE_PRINT_BG_WAIT_CEILING_MS)",
+          "source": "https://code.claude.com/docs/en/headless"
+        },
+        {
+          "text": "In -p, an unset permission mode takes the built-in starting mode, which can be auto; pass --permission-mode explicitly",
+          "source": "https://code.claude.com/docs/en/headless"
+        }
+      ],
+      "open_questions": [
+        "Exact Bedrock/Vertex/Foundry companion env vars (AWS_REGION, ANTHROPIC_VERTEX_PROJECT_ID, CLOUD_ML_REGION etc.) not verified in this pass; see provider pages.",
+        "npm latest (2.1.301) may differ from the native installer 'stable' channel version.",
+        "Which environments count as a 'recognized sandbox' that skips the root check is not enumerated in the fetched docs."
+      ],
+      "last_verified": "2026-10-19",
+      "auth_summary": "`ANTHROPIC_API_KEY`, or `CLAUDE_CODE_OAUTH_TOKEN` for a subscription"
+    },
+    {
+      "id": "codex",
+      "name": "Codex CLI",
+      "vendor": "OpenAI",
+      "binary": "codex",
+      "summary": "OpenAI's open-source terminal coding agent.",
+      "homepage": "https://developers.openai.com/codex",
+      "docs": "https://learn.chatgpt.com/docs/developer-commands?surface=cli",
+      "repo": "https://github.com/openai/codex",
+      "license": {
+        "value": "Apache-2.0",
+        "open_source": true,
+        "quote": "This repository is licensed under the Apache-2.0 License.",
+        "source": "https://github.com/openai/codex"
+      },
+      "latest_version_checked": "0.163.0",
+      "install": [
+        {
+          "label": "npm",
+          "command": "npm install -g @openai/codex",
+          "requirements": "Node.js 16+",
+          "quote": "npm install -g @openai/codex",
+          "source": "https://github.com/openai/codex"
+        },
+        {
+          "label": "Install script",
+          "command": "curl -fsSL https://chatgpt.com/codex/install.sh | sh",
+          "requirements": null,
+          "quote": "curl -fsSL https://chatgpt.com/codex/install.sh | sh",
+          "source": "https://github.com/openai/codex"
+        }
+      ],
+      "headless_doc": {
+        "value": "codex exec \"<task>\"",
+        "detail": "codex exec \"<prompt>\" (short form: codex e)",
+        "notes": "Streams progress to stderr and prints only the final agent message to stdout. Runs in a read-only sandbox by default. Requires running inside a Git repository unless --skip-git-repo-check. -o/--output-last-message <path> writes final message to a file; --ephemeral avoids persisting session files.",
+        "quote": "While `codex exec` runs, Codex streams progress to `stderr` and prints only the final agent message to `stdout`.",
+        "source": "https://learn.chatgpt.com/docs/non-interactive-mode"
+      },
+      "auto_approve": {
+        "value": "`--sandbox workspace-write` (edits), `--approve-for-me`, or `--sandbox danger-full-access` in an isolated container. `--full-auto` was removed",
+        "detail": "Allow edits: codex exec --sandbox workspace-write \"<task>\". Auto-reviewed approvals: --approve-for-me (alias --not-so-yolo) = workspace-write + on-request with automatic approval review. Full access in an isolated container: --sandbox danger-full-access. No sandbox and no approvals: --dangerously-bypass-approvals-and-sandbox (alias --yolo). --full-auto is NO LONGER SUPPORTED.",
+        "notes": "--approve-for-me conflicts with --sandbox and --yolo. Docs: use danger-full-access only in a controlled environment such as an isolated CI runner or container; --yolo only inside an externally hardened environment.",
+        "quote": "`--full-auto` is no longer supported.",
+        "source": "https://learn.chatgpt.com/docs/non-interactive-mode"
+      },
+      "json_output": {
+        "value": "`--json` (JSON Lines events)",
+        "detail": "--json (alias --experimental-json): newline-delimited JSON events on stdout",
+        "quote": "When you enable `--json`, `stdout` becomes a JSON Lines (JSONL) stream.",
+        "source": "https://learn.chatgpt.com/docs/non-interactive-mode"
+      },
+      "resume": {
+        "value": "`codex exec resume --last` / `codex exec resume <id>`",
+        "detail": "codex exec resume --last \"<prompt>\" or codex exec resume <SESSION_ID>; interactive: codex resume [ID] / codex resume --last",
+        "quote": "Resume an exec session by ID or add `--last` to continue the most recent session from the current working directory.",
+        "source": "https://learn.chatgpt.com/docs/developer-commands?surface=cli"
+      },
+      "model_flag": {
+        "value": "`-m, --model`",
+        "detail": "--model / -m <model>",
+        "quote": "Override the model set in configuration (for example `gpt-6.1-sol`).",
+        "source": "https://learn.chatgpt.com/docs/developer-commands?surface=cli"
+      },
+      "providers": {
+        "value": "OpenAI models by default; other providers via `model_providers` in `config.toml`; local models with `--oss` (Ollama, LM Studio)",
+        "detail": "OpenAI models by default; custom providers via model_providers.<id> (base_url, env_key) in config.toml; local open-source models via --oss with --local-provider lmstudio|ollama.",
+        "quote": "Provider id from `model_providers` (default: `openai`).",
+        "source": "https://learn.chatgpt.com/docs/config-file/config-reference"
+      },
+      "instructions_file": {
+        "value": "`AGENTS.md` (and `AGENTS.override.md`)",
+        "detail": "AGENTS.md (and AGENTS.override.md) in ~/.codex (or CODEX_HOME) and in each directory from project root down to cwd; extra names via project_doc_fallback_filenames; 32 KiB combined default limit (project_doc_max_bytes).",
+        "quote": "Codex reads `AGENTS.override.md` if it exists. Otherwise, Codex reads `AGENTS.md`.",
+        "source": "https://learn.chatgpt.com/docs/agent-configuration/agents-md"
+      },
+      "config_dir": {
+        "value": "`~/.codex/config.toml`; credentials in `~/.codex/auth.json` (plain text) unless you use the keyring",
+        "detail": "~/.codex/ (override with CODEX_HOME); config in ~/.codex/config.toml; credentials in plaintext ~/.codex/auth.json by default, or OS keyring via cli_auth_credentials_store (file|keyring|auto|ephemeral).",
+        "quote": "Codex caches login details locally in a plaintext file at `~/.codex/auth.json`",
+        "source": "https://learn.chatgpt.com/docs/auth"
+      },
+      "sandbox": {
+        "value": "Yes: bubblewrap + seccomp on Linux, Seatbelt on macOS; network off by default",
+        "detail": "Built-in: Seatbelt on macOS; bubblewrap + seccomp on Linux/WSL. Network off by default; writes limited to workspace. Modes: read-only | workspace-write | danger-full-access. May fail inside Docker if namespaces/setuid bwrap/seccomp are blocked; if the container is the security boundary, use --sandbox danger-full-access.",
+        "quote": "On Linux and WSL, Codex uses bubblewrap and seccomp to enforce filesystem restrictions.",
+        "source": "https://learn.chatgpt.com/docs/permissions"
+      },
+      "mcp": {
+        "value": "Yes: `codex mcp add`, or `[mcp_servers]` in `config.toml`",
+        "detail": "Yes. codex mcp add <name> -- <command...> (stdio) or codex mcp add <name> --url <url> (streamable HTTP); or [mcp_servers.<id>] in ~/.codex/config.toml.",
+        "quote": "Register a server using a stdio launcher command or a streamable HTTP URL.",
+        "source": "https://learn.chatgpt.com/docs/developer-commands?surface=cli"
+      },
+      "pricing_note": {
+        "value": "Included with ChatGPT plans (usage limits apply), or pay-per-token API",
+        "detail": "Included with ChatGPT Free, Go, Plus, Pro, Business, Edu, Enterprise plans (usage limits apply per plan); API-key usage billed at standard API rates.",
+        "quote": "ChatGPT Work and Codex are included in your ChatGPT Free, Go, Plus, Pro, Business, Edu, or Enterprise plan",
+        "source": "https://learn.chatgpt.com/docs/pricing"
+      },
+      "providers_short": "OpenAI; others via config",
+      "update_env": {
+        "value": "`check_for_update_on_startup = false` in `config.toml`",
+        "detail": "No env vars documented; use config.toml keys: check_for_update_on_startup = false, analytics.enabled = false, feedback.enabled = false.",
+        "quote": "Check for Codex updates on startup (set to false only when updates are centrally managed).",
+        "source": "https://learn.chatgpt.com/docs/config-file/config-reference"
+      },
+      "auth": [
+        {
+          "method": "API key (per-run env var for exec)",
+          "env": [
+            "CODEX_API_KEY"
+          ],
+          "how": "CODEX_API_KEY=<api-key> codex exec --json \"<task>\"; set it only for the codex invocation, not as a job-level env var in workflows running repo-controlled code.",
+          "quote": "set `CODEX_API_KEY` only for the Codex invocation that needs it.",
+          "source": "https://learn.chatgpt.com/docs/non-interactive-mode"
+        },
+        {
+          "method": "API key (stored login)",
+          "env": [
+            "OPENAI_API_KEY"
+          ],
+          "how": "printenv OPENAI_API_KEY | codex login --with-api-key",
+          "quote": "Read an API key from stdin (for example `printenv OPENAI_API_KEY | codex login --with-api-key`).",
+          "source": "https://learn.chatgpt.com/docs/developer-commands?surface=cli"
+        },
+        {
+          "method": "ChatGPT subscription via device code (headless)",
+          "env": [],
+          "how": "codex login --device-auth, open the shown link on any device and enter the one-time code (beta).",
+          "quote": "Use OAuth device code flow instead of launching a browser window.",
+          "source": "https://learn.chatgpt.com/docs/developer-commands?surface=cli"
+        },
+        {
+          "method": "ChatGPT subscription via copied auth cache",
+          "env": [
+            "CODEX_HOME"
+          ],
+          "how": "Log in on a machine with a browser, then copy ~/.codex/auth.json to ~/.codex/auth.json on the headless machine. Treat it like a password. Not for public/open-source repo CI.",
+          "quote": "Copy `~/.codex/auth.json` to `~/.codex/auth.json` on the headless machine.",
+          "source": "https://learn.chatgpt.com/docs/auth"
+        },
+        {
+          "method": "ChatGPT subscription via SSH port forward",
+          "env": [],
+          "how": "ssh -L 1455:localhost:1455 user@remote, then run codex login in that session and complete the browser flow locally.",
+          "quote": "tunneling Codex's local callback server (default `localhost:1455`)",
+          "source": "https://learn.chatgpt.com/docs/auth"
+        }
+      ],
+      "run": {
+        "version": "codex --version",
+        "headless": "codex exec \"<task>\"",
+        "unattended": "codex exec --sandbox workspace-write \"Fix the failing tests\"",
+        "explain": [
+          [
+            "exec",
+            "Non-interactive: progress goes to stderr, the final message to stdout, then it exits"
+          ],
+          [
+            "--sandbox workspace-write",
+            "Let Codex edit files in the repository. The default for `exec` is read-only"
+          ],
+          [
+            "--sandbox danger-full-access",
+            "Alternative when the container or VM is your isolation boundary, or Codex's own sandbox can't start inside Docker"
+          ]
+        ]
+      },
+      "container": {
+        "install": "ensure_node && npm install -g --prefix \"$HOME/.npm-global\" @openai/codex",
+        "run": "codex exec --sandbox \"${CODEX_SANDBOX:-workspace-write}\" \"$prompt\""
+      },
+      "northflank": {
+        "native": true,
+        "harness_type": "codex",
+        "ui_label": "Codex",
+        "api_auth": "apiKey or account",
+        "auth": "an OpenAI API key, or sign in with your ChatGPT account in the harness terminal"
+      },
+      "gotchas": [
+        {
+          "text": "--full-auto was removed; use --sandbox workspace-write or --approve-for-me",
+          "source": "https://learn.chatgpt.com/docs/non-interactive-mode"
+        },
+        {
+          "text": "codex exec defaults to a read-only sandbox, so edits fail unless you pass --sandbox workspace-write or higher",
+          "source": "https://learn.chatgpt.com/docs/non-interactive-mode"
+        },
+        {
+          "text": "codex exec refuses to run outside a Git repo unless --skip-git-repo-check",
+          "source": "https://learn.chatgpt.com/docs/non-interactive-mode"
+        },
+        {
+          "text": "In Docker the bubblewrap sandbox may fail if namespaces, setuid bwrap or seccomp are blocked; if the container is the boundary use --sandbox danger-full-access",
+          "source": "https://learn.chatgpt.com/docs/agent-approvals-security"
+        },
+        {
+          "text": "Sandbox network access is off by default; commands needing network (npm install, pip) need it enabled or full access",
+          "source": "https://learn.chatgpt.com/docs/agent-approvals-security"
+        },
+        {
+          "text": "~/.codex/auth.json is plaintext and contains access tokens; treat like a password",
+          "source": "https://learn.chatgpt.com/docs/auth"
+        },
+        {
+          "text": "Do not set OPENAI_API_KEY or CODEX_API_KEY as job-level env vars in workflows running repository-controlled code",
+          "source": "https://learn.chatgpt.com/docs/non-interactive-mode"
+        }
+      ],
+      "open_questions": [
+        "developers.openai.com/codex/* now 308-redirects to learn.chatgpt.com/docs/*; both are OpenAI-official but URLs may change again.",
+        "Default approval policy for codex exec (e.g. whether it is 'never') is not stated on the non-interactive page.",
+        "No documented env vars for disabling telemetry/update checks; only config.toml keys found.",
+        "Exact per-plan usage limits not captured.",
+        "GitHub latest release tag not confirmed (README release section empty in fetch); npm shows 0.163.0.",
+        "OPENAI_API_KEY is not documented as being read directly by codex exec; documented path is CODEX_API_KEY or codex login --with-api-key."
+      ],
+      "last_verified": "2026-10-19",
+      "auth_summary": "`CODEX_API_KEY`, or `codex login --device-auth` for ChatGPT plans"
+    },
+    {
+      "id": "cursor-cli",
+      "name": "Cursor CLI",
+      "vendor": "Cursor (Anysphere)",
+      "binary": "agent",
+      "summary": "Cursor's coding agent in the terminal (command: `agent`).",
+      "homepage": "https://cursor.com/cli",
+      "docs": "https://cursor.com/docs/cli/overview",
+      "repo": null,
+      "license": {
+        "value": "Proprietary",
+        "open_source": false,
+        "quote": null,
+        "source": "https://cursor.com/docs/cli/overview"
+      },
+      "latest_version_checked": "2026.10.08",
+      "install": [
+        {
+          "label": "Install script",
+          "command": "curl https://cursor.com/install -fsS | bash",
+          "requirements": null,
+          "quote": "Install Cursor CLI with a single command:",
+          "source": "https://cursor.com/docs/cli/installation"
+        }
+      ],
+      "headless_doc": {
+        "value": "agent -p \"<task>\"",
+        "detail": "agent -p --force --output-format text \"<prompt>\"",
+        "notes": "Print mode prints the final response. Default output format is text. On failure the process exits non-zero and writes an error to stderr. Print mode is also inferred when stdout is not a TTY or stdin is piped.",
+        "quote": "Use print mode (`-p, --print`) for non-interactive scripting and automation.",
+        "source": "https://cursor.com/docs/cli/headless"
+      },
+      "auto_approve": {
+        "value": "`--force` (alias `--yolo`) plus `--trust` in headless mode; or allow/deny rules in `cli-config.json`",
+        "detail": "-f/--force (alias --yolo); --trust to trust the workspace without prompting in headless mode; --approve-mcps for MCP servers. Safer: permissions.allow/deny in ~/.cursor/cli-config.json or <project>/.cursor/cli.json, approvalMode (allowlist | auto-review | unrestricted), --sandbox enabled",
+        "notes": "Headless docs say that without --force changes are only proposed, not applied. The 'Using' page says 'Cursor has full write access in non-interactive mode'. The two pages conflict.",
+        "quote": "Combine `--print` with `--force` (or `--yolo`) to modify files in scripts:",
+        "source": "https://cursor.com/docs/cli/headless"
+      },
+      "json_output": {
+        "value": "`--output-format json` or `stream-json`",
+        "detail": "--output-format json | stream-json (requires --print); --stream-partial-output for text deltas",
+        "quote": "Output format (only works with `--print`): `text`, `json`, or `stream-json` (default: `text`)",
+        "source": "https://cursor.com/docs/cli/reference/parameters"
+      },
+      "resume": {
+        "value": "`--resume [chatId]`, `--continue`",
+        "detail": "--resume [chatId], --continue, `agent resume`, `agent ls`",
+        "quote": "Continue from an existing thread with `--resume [thread id]` to load prior context.",
+        "source": "https://cursor.com/docs/cli/using"
+      },
+      "model_flag": {
+        "value": "`--model <model>` (`agent models` lists them)",
+        "detail": "--model <model> (list with --list-models or `agent models`)",
+        "quote": "agent -p \"Your prompt here\" --model gpt-5",
+        "source": "https://cursor.com/docs/cli/github-actions"
+      },
+      "providers": {
+        "value": "Models available on your Cursor account (Anthropic, OpenAI and others, or `auto`); bring-your-own AWS Bedrock",
+        "detail": "Models available on the user's Cursor account (e.g. gpt-5, sonnet-4-thinking, auto); BYOK AWS Bedrock via `agent bedrock`",
+        "quote": "you can now pick Claude Opus 5.5 and Sonnet 5.5 from the bring-your-own-key model list.",
+        "source": "https://cursor.com/docs/cli/changelog"
+      },
+      "instructions_file": {
+        "value": "`.cursor/rules`, `AGENTS.md`, `CLAUDE.md`",
+        "detail": ".cursor/rules (.mdc), AGENTS.md, CLAUDE.md at project root",
+        "quote": "The CLI also reads `AGENTS.md` and `CLAUDE.md` at the project root (if\npresent) and applies them as rules alongside `.cursor/rules`.",
+        "source": "https://cursor.com/docs/cli/using"
+      },
+      "config_dir": {
+        "value": "`~/.cursor/cli-config.json`; project `.cursor/cli.json`",
+        "detail": "~/.cursor/cli-config.json (global), <project>/.cursor/cli.json (project, permissions only); override with CURSOR_CONFIG_DIR or $XDG_CONFIG_HOME/cursor/cli-config.json. Credential storage location not documented.",
+        "quote": "**`CURSOR_CONFIG_DIR`**: custom directory path",
+        "source": "https://cursor.com/docs/cli/reference/configuration"
+      },
+      "sandbox": {
+        "value": "Yes on Linux: Landlock + seccomp (kernel 6.2+); falls back to asking",
+        "detail": "Yes, for shell commands. Linux uses Landlock and seccomp and needs kernel 6.2+ with Landlock v3 and unprivileged user namespaces. Otherwise it falls back to asking for approval. Use `--sandbox enabled|disabled` or `agent sandbox enable`.",
+        "quote": "Cursor uses Landlock and seccomp. Landlock applies filesystem restrictions. Seccomp blocks unsafe syscalls.",
+        "source": "https://cursor.com/docs/agent/security/run-modes"
+      },
+      "mcp": {
+        "value": "Yes: shares the editor's `mcp.json`; `agent mcp ...`",
+        "detail": "yes; uses same mcp.json as the editor (project -> global -> nested); manage with `agent mcp list|list-tools|login|enable|disable`; --approve-mcps to skip approval",
+        "quote": "**MCP in the CLI uses the same configuration as the editor**",
+        "source": "https://cursor.com/docs/cli/mcp"
+      },
+      "pricing_note": {
+        "value": "Uses your Cursor account's plan; the CLI docs don't state which plans include it",
+        "source": "https://cursor.com/docs/cli/reference/authentication"
+      },
+      "providers_short": "Models on your Cursor plan",
+      "update_env": {
+        "value": "none documented",
+        "quote": "Cursor CLI will try to auto-update by default to ensure you always have the latest version.",
+        "source": "https://cursor.com/docs/cli/installation"
+      },
+      "auth": [
+        {
+          "method": "API key env var",
+          "env": [
+            "CURSOR_API_KEY"
+          ],
+          "how": "Generate a user API key at https://cursor.com/dashboard/api, then export CURSOR_API_KEY=... (or pass --api-key <key>).",
+          "quote": "For automation, scripts, or CI environments, use API key authentication:",
+          "source": "https://cursor.com/docs/cli/reference/authentication"
+        },
+        {
+          "method": "login on headless",
+          "env": [
+            "NO_OPEN_BROWSER"
+          ],
+          "how": "Run `NO_OPEN_BROWSER=1 agent login`, open the printed URL in a browser on any machine and complete the login. Check with `agent status`.",
+          "quote": "Set `NO_OPEN_BROWSER=1` to print the login URL without opening a browser.",
+          "source": "https://cursor.com/docs/cli/reference/authentication"
+        }
+      ],
+      "run": {
+        "version": "agent --version",
+        "headless": "agent -p \"<task>\"",
+        "unattended": "agent -p --force --trust --output-format text \"Fix the failing tests\"",
+        "explain": [
+          [
+            "-p",
+            "Print mode: run without the interactive UI and print the final response"
+          ],
+          [
+            "--force",
+            "Apply file changes and run commands without asking (alias `--yolo`)"
+          ],
+          [
+            "--trust",
+            "Trust the workspace without the interactive trust prompt"
+          ],
+          [
+            "--output-format text",
+            "Plain text output. Use `json` for one JSON result"
+          ]
+        ]
+      },
+      "container": {
+        "install": "curl https://cursor.com/install -fsS | bash",
+        "run": "agent -p --force --trust --output-format text \"$prompt\""
+      },
+      "northflank": {
+        "native": true,
+        "harness_type": "cursor",
+        "ui_label": "Cursor",
+        "api_auth": "apiKey or account",
+        "auth": "a Cursor API key, or sign in with your Cursor account in the harness terminal"
+      },
+      "gotchas": [
+        {
+          "text": "The install script puts the binary in ~/.local/bin, which you must add to PATH",
+          "source": "https://cursor.com/docs/cli/installation"
+        },
+        {
+          "text": "Auto-updates by default. The CLI pages document no switch to turn this off",
+          "source": "https://cursor.com/docs/cli/installation"
+        },
+        {
+          "text": "Use --trust to skip the workspace-trust prompt in headless mode",
+          "source": "https://cursor.com/docs/cli/reference/parameters"
+        },
+        {
+          "text": "Linux sandbox needs kernel 6.2+ with Landlock v3 and unprivileged user namespaces. The standalone CLI does not ship the AppArmor profile, so you may need the cursor-sandbox-apparmor package",
+          "source": "https://cursor.com/docs/agent/security/run-modes"
+        },
+        {
+          "text": "Behind a firewall, allowlist *.cursor.sh and *.cursorapi.com. HTTP_PROXY/HTTPS_PROXY and NODE_USE_ENV_PROXY=1 are supported, and network.useHttp1ForAgent helps with proxies that can't do HTTP/2",
+          "source": "https://cursor.com/help/integrations/cli"
+        },
+        {
+          "text": "With --output-format json, a failed run exits non-zero and emits no JSON object, only stderr",
+          "source": "https://cursor.com/docs/cli/reference/output-format"
+        },
+        {
+          "text": "Agent commits and PRs get a 'Made with Cursor' trailer/footer by default (attribution.* in cli-config.json)",
+          "source": "https://cursor.com/docs/cli/reference/configuration"
+        },
+        {
+          "text": "The binary is `agent`; the install script also creates a legacy `cursor-agent` symlink, both in `~/.local/bin` (checked in the script on 2026-10-16)",
+          "source": "https://cursor.com/install"
+        }
+      ],
+      "open_questions": [
+        "The CLI docs don't say which Cursor plan the CLI or a user API key needs, or how CLI usage is billed.",
+        "The docs contradict each other on print mode without --force. headless.md says changes are 'only proposed, not applied'. using.md says 'Cursor has full write access in non-interactive mode'.",
+        "No documented env var or flag to disable auto-update or telemetry.",
+        "Where credentials from `agent login` are stored on disk is not documented.",
+        "No official license statement found."
+      ],
+      "last_verified": "2026-10-19",
+      "auth_summary": "`CURSOR_API_KEY`"
+    },
+    {
+      "id": "opencode",
+      "name": "OpenCode",
+      "vendor": "Anomaly (formerly SST)",
+      "binary": "opencode",
+      "summary": "Open-source terminal coding agent that works with 75+ model providers.",
+      "homepage": "https://opencode.ai",
+      "docs": "https://opencode.ai/docs/",
+      "repo": "https://github.com/anomalyco/opencode",
+      "license": {
+        "value": "MIT",
+        "open_source": true,
+        "quote": "MIT License",
+        "source": "https://github.com/anomalyco/opencode/blob/dev/LICENSE"
+      },
+      "latest_version_checked": "1.19.3 (OpenCode 1, npm opencode-ai and GitHub releases); 2.0.31 (OpenCode 2, npm @opencode/cli)",
+      "install": [
+        {
+          "label": "Install script",
+          "command": "curl -fsSL https://opencode.ai/install | bash",
+          "requirements": null,
+          "quote": "The easiest way to install OpenCode 1 is through the install script.",
+          "source": "https://opencode.ai/docs/"
+        },
+        {
+          "label": "npm",
+          "command": "npm install -g opencode-ai",
+          "requirements": null,
+          "quote": "npm install -g opencode-ai",
+          "source": "https://opencode.ai/docs/"
+        }
+      ],
+      "headless_doc": {
+        "value": "opencode run \"<task>\"",
+        "detail": "opencode run \"<prompt>\"",
+        "notes": "Non-interactive mode; prints formatted output by default (--format json for raw JSON events). Can attach to a running server with --attach http://host:4096 to avoid MCP cold boot. Exit-code behaviour not documented. Same `opencode run` command exists in OpenCode 2.",
+        "quote": "Run opencode in non-interactive mode by passing a prompt directly.",
+        "source": "https://opencode.ai/docs/cli/"
+      },
+      "auto_approve": {
+        "value": "`opencode run --auto`, or `\"permission\": \"allow\"` in `opencode.json`. Most actions are allowed by default",
+        "detail": "opencode run --auto \"<prompt>\"  (or set \"permission\": \"allow\" in opencode.json, or OPENCODE_PERMISSION env with inline JSON)",
+        "notes": "Defaults are already permissive: most permissions default to allow; doom_loop and external_directory default to ask; .env reads denied. --auto approves anything not explicitly denied; explicit deny rules still apply. OpenCode 2 uses an ordered `permissions` array instead of the V1 `permission` map, and allows external_directory by default.",
+        "quote": "Start OpenCode with --auto to automatically approve permission requests that are not explicitly denied.",
+        "source": "https://opencode.ai/docs/permissions/"
+      },
+      "json_output": {
+        "value": "`--format json`",
+        "detail": "--format json",
+        "quote": "--formatFormat: default (formatted) or json (raw JSON events)",
+        "source": "https://opencode.ai/docs/cli/"
+      },
+      "resume": {
+        "value": "`-c, --continue` / `-s, --session <id>`",
+        "detail": "-c / --continue (last session) or -s / --session <id>; optional --fork",
+        "quote": "--continue-cContinue the last session",
+        "source": "https://opencode.ai/docs/cli/"
+      },
+      "model_flag": {
+        "value": "`-m provider/model`",
+        "detail": "-m / --model provider/model (plus --variant for reasoning effort)",
+        "quote": "--model-mModel to use in the form of provider/model",
+        "source": "https://opencode.ai/docs/cli/"
+      },
+      "providers": {
+        "value": "75+ providers (Anthropic, OpenAI, Bedrock, Vertex, Azure, OpenRouter, GitHub Copilot, local models and more)",
+        "detail": "75+ providers via AI SDK and Models.dev (Anthropic, OpenAI, Bedrock, Vertex, Azure, OpenRouter, Copilot, GitLab Duo, local models, OpenCode Zen/Go, etc.)",
+        "quote": "OpenCode uses the AI SDK and Models.dev to support 75+ LLM providers and it supports running local models.",
+        "source": "https://opencode.ai/docs/providers/"
+      },
+      "instructions_file": {
+        "value": "`AGENTS.md` (falls back to `CLAUDE.md` in OpenCode 1)",
+        "detail": "AGENTS.md (project, traversing up) and ~/.config/opencode/AGENTS.md; falls back to CLAUDE.md / ~/.claude/CLAUDE.md in V1; extra files via \"instructions\" in opencode.json. V2 only discovers AGENTS.md.",
+        "quote": "You can provide custom instructions to opencode by creating an AGENTS.md file.",
+        "source": "https://opencode.ai/docs/rules/"
+      },
+      "config_dir": {
+        "value": "`~/.config/opencode/opencode.json`; keys in `~/.local/share/opencode/auth.json`",
+        "detail": "~/.config/opencode/opencode.json(c) (global), <project>/opencode.json(c), <project>/.opencode/; credentials in ~/.local/share/opencode/auth.json (V1) or ~/.local/share/opencode/opencode.db (V2). Override with OPENCODE_CONFIG / OPENCODE_CONFIG_DIR / OPENCODE_CONFIG_CONTENT.",
+        "quote": "When you add a provider’s API keys with the /connect command, they are stored\nin ~/.local/share/opencode/auth.json.",
+        "source": "https://opencode.ai/docs/providers/"
+      },
+      "sandbox": {
+        "value": "None; permission rules only",
+        "detail": "None documented; relies on permission rules (allow/ask/deny)",
+        "quote": "OpenCode uses the permission config to decide whether a given action should run automatically, prompt you, or be blocked.",
+        "source": "https://opencode.ai/docs/permissions/"
+      },
+      "mcp": {
+        "value": "Yes: `mcp` in `opencode.json`, `opencode mcp add`",
+        "detail": "Yes: local and remote servers under \"mcp\" in opencode.json; `opencode mcp add|list|auth`",
+        "quote": "OpenCode supports both local and remote servers.",
+        "source": "https://opencode.ai/docs/mcp-servers/"
+      },
+      "pricing_note": {
+        "value": "Free (MIT); you pay your model provider. Optional OpenCode Zen and Go plans",
+        "detail": "Free and MIT open source; you pay your model provider. Optional paid OpenCode Zen (curated pay-as-you-go models) and OpenCode Go ($10/month subscription to open models).",
+        "quote": "You can also try OpenCode Go a $10/month subscription\nplan that grants you access to the best open source models.",
+        "source": "https://opencode.ai/v2/docs/"
+      },
+      "providers_short": "75+ providers, local models",
+      "server_mode": {
+        "value": "`opencode serve` (HTTP API with OpenAPI spec), `opencode run --attach <url>`",
+        "detail": "opencode serve [--port 4096] [--hostname 127.0.0.1] (HTTP + OpenAPI 3.1, protect with OPENCODE_SERVER_PASSWORD); opencode web; opencode acp (stdio); opencode attach <url>. V2 adds a shared background service and `opencode pair` web UI.",
+        "quote": "The opencode serve command runs a headless HTTP server that exposes an OpenAPI endpoint that an opencode client can use.",
+        "source": "https://opencode.ai/docs/server/"
+      },
+      "update_env": {
+        "value": "`OPENCODE_DISABLE_AUTOUPDATE=1`",
+        "detail": "OPENCODE_DISABLE_AUTOUPDATE=1 or \"autoupdate\": false in config; OPENCODE_DISABLE_MODELS_FETCH, OPENCODE_DISABLE_LSP_DOWNLOAD also useful offline. No telemetry env var documented.",
+        "quote": "OPENCODE_DISABLE_AUTOUPDATEbooleanDisable automatic update checks",
+        "source": "https://opencode.ai/docs/cli/"
+      },
+      "auth": [
+        {
+          "method": "API key env var / .env",
+          "env": [
+            "ANTHROPIC_API_KEY",
+            "OPENAI_API_KEY",
+            "AWS_ACCESS_KEY_ID",
+            "AWS_SECRET_ACCESS_KEY",
+            "AWS_PROFILE",
+            "AWS_BEARER_TOKEN_BEDROCK"
+          ],
+          "how": "Export the provider's key in the environment (or a project .env) before running opencode; OpenCode picks it up at startup. Config can also reference keys with {env:VAR}.",
+          "quote": "When OpenCode starts up it loads the providers from the credentials file. And if there are any keys defined in your environments or a .env file in your project.",
+          "source": "https://opencode.ai/docs/cli/"
+        },
+        {
+          "method": "opencode auth login (API key stored in file)",
+          "env": [],
+          "how": "Run `opencode auth login` (optionally --provider <id> --method <label>) in an SSH terminal and paste the key; stored in ~/.local/share/opencode/auth.json. Copy that file into the container/VM to reuse.",
+          "quote": "This is stored in ~/.local/share/opencode/auth.json.",
+          "source": "https://opencode.ai/docs/cli/"
+        },
+        {
+          "method": "subscription login (GitHub Copilot device code)",
+          "env": [],
+          "how": "/connect -> GitHub Copilot, then open github.com/login/device on any machine and enter the code. ChatGPT Plus/Pro and Claude Pro/Max options in V1 docs open a browser; headless behaviour not documented.",
+          "quote": "Navigate to github.com/login/device and enter the code.",
+          "source": "https://opencode.ai/docs/providers/"
+        },
+        {
+          "method": "OpenCode 2: env var must be on the server process",
+          "env": [
+            "ANTHROPIC_API_KEY"
+          ],
+          "how": "V2 runs a shared background server; use `ANTHROPIC_API_KEY=... opencode --standalone` or `opencode service set env ANTHROPIC_API_KEY ...`. V2 credentials live in SQLite (~/.local/share/opencode/opencode.db).",
+          "quote": "Set a provider’s supported environment variable on the server process that runs model requests.",
+          "source": "https://opencode.ai/v2/docs/cli/providers/"
+        }
+      ],
+      "run": {
+        "version": "opencode --version",
+        "headless": "opencode run \"<task>\"",
+        "unattended": "opencode run --auto -m anthropic/claude-sonnet-5-5 \"Fix the failing tests\"",
+        "explain": [
+          [
+            "run",
+            "Non-interactive mode: run one prompt and exit"
+          ],
+          [
+            "--auto",
+            "Approve anything that isn't explicitly denied in your permission config"
+          ],
+          [
+            "-m anthropic/claude-sonnet-5-5",
+            "Provider and model, as `provider/model`. Use any model your provider key has access to"
+          ]
+        ]
+      },
+      "container": {
+        "install": "ensure_node && npm install -g --prefix \"$HOME/.npm-global\" opencode-ai",
+        "run": "opencode run --auto ${OPENCODE_MODEL:+-m \"$OPENCODE_MODEL\"} \"$prompt\""
+      },
+      "northflank": {
+        "native": true,
+        "harness_type": "opencode",
+        "ui_label": "OpenCode",
+        "api_auth": "account",
+        "auth": "the harness uses account mode for OpenCode: connect a provider inside the agent, or add a provider key such as `ANTHROPIC_API_KEY` as a runtime variable"
+      },
+      "gotchas": [
+        {
+          "text": "Two major versions are live: OpenCode 1 (opencode.ai/docs, npm opencode-ai, GitHub releases v1.19.x) and OpenCode 2 (opencode.ai/v2/docs, npm @opencode/cli 2.0.x). Both install the `opencode` command and cannot be installed side by side",
+          "source": "https://opencode.ai/docs/"
+        },
+        {
+          "text": "serve defaults to hostname 127.0.0.1 port 4096; set --hostname 0.0.0.0 to expose it and set OPENCODE_SERVER_PASSWORD for basic auth",
+          "source": "https://opencode.ai/docs/server/"
+        },
+        {
+          "text": "OpenCode auto-downloads updates at startup unless autoupdate is false / OPENCODE_DISABLE_AUTOUPDATE is set; pin versions in images",
+          "source": "https://opencode.ai/docs/config/"
+        },
+        {
+          "text": "V2: the CLI starts/uses one shared background server per user; env vars like ANTHROPIC_API_KEY must be set on that server (opencode service set env) or use --standalone",
+          "source": "https://opencode.ai/v2/docs/cli/providers/"
+        },
+        {
+          "text": "V2: API-key entry and paste-code OAuth in `opencode auth login` require an interactive terminal",
+          "source": "https://opencode.ai/v2/docs/cli/providers/"
+        },
+        {
+          "text": "Docs state Anthropic prohibits using Claude Pro/Max via third-party plugins; bundled plugins were removed as of 1.3.0, so use an Anthropic API key",
+          "source": "https://opencode.ai/docs/providers/"
+        },
+        {
+          "text": "Official Docker image: ghcr.io/anomalyco/opencode",
+          "source": "https://opencode.ai/docs/"
+        }
+      ],
+      "open_questions": [
+        "Which major version the guide should target: README on the dev branch installs @opencode/cli (V2), but opencode.ai/docs and GitHub releases are still V1 (1.19.3).",
+        "V2 CLI docs do not list `opencode run` flags (--auto, --format json, -m, -c); assumed unchanged from V1 per the migration guide's compatibility statement, but not explicitly documented for V2.",
+        "Exit codes of `opencode run` on failure are not documented.",
+        "Behaviour of `opencode run` when a permission resolves to \"ask\" without --auto (block, fail, or auto-reject) is not documented.",
+        "Whether ChatGPT Plus/Pro login works on a headless server (device code vs browser) in V1 is not documented; V2 TUI mentions 'Codex device code (legacy)'.",
+        "No telemetry opt-out documented."
+      ],
+      "last_verified": "2026-10-19",
+      "auth_summary": "Provider key, e.g. `ANTHROPIC_API_KEY`"
+    },
+    {
+      "id": "pi",
+      "name": "Pi",
+      "vendor": "Earendil Works (by Mario Zechner)",
+      "binary": "pi",
+      "summary": "Minimal, extensible open-source terminal coding agent by Mario Zechner.",
+      "homepage": "https://pi.dev",
+      "docs": "https://pi.dev/docs/latest",
+      "repo": "https://github.com/earendil-works/pi",
+      "license": {
+        "value": "MIT",
+        "open_source": true,
+        "quote": "## License\n\nMIT",
+        "source": "https://github.com/earendil-works/pi"
+      },
+      "latest_version_checked": "1.3.0",
+      "install": [
+        {
+          "label": "Install script",
+          "command": "curl -fsSL https://pi.dev/install.sh | sh",
+          "requirements": null,
+          "quote": "Pi requires Node.js 22.19 or newer. The macOS, Linux, and Windows installers can install it if needed.",
+          "source": "https://github.com/earendil-works/pi"
+        },
+        {
+          "label": "npm",
+          "command": "npm install -g --ignore-scripts @earendil-works/pi-coding-agent",
+          "requirements": "Node.js 22.19+",
+          "quote": "Alternatively, install directly with npm, which does not pin transitive dependencies",
+          "source": "https://github.com/earendil-works/pi"
+        }
+      ],
+      "headless_doc": {
+        "value": "pi -p \"<task>\"",
+        "detail": "pi -p \"<prompt>\"",
+        "notes": "Print mode runs the prompt(s), writes only the final assistant text to stdout and exits. Piped stdin is prepended to the prompt (e.g. git diff | pi -p \"Review this change\"). If stdin or stdout is redirected and no JSON/RPC mode is chosen, Pi uses print mode automatically.",
+        "quote": "`-p`, `--print` | Run the supplied prompts, write the final assistant text to stdout, then exit",
+        "source": "https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/cli.md"
+      },
+      "auto_approve": {
+        "value": "Not needed: Pi has no permission prompts. Limit tools with `--tools` / `--exclude-tools`",
+        "detail": "Not needed: Pi has no permission/approval prompts. Tools read, bash, edit, write are enabled by default. Restrict with --tools / --exclude-tools / --no-tools. Separately, project-local .pi config is trust-gated: pass -a/--approve (or set defaultProjectTrust: \"always\") to load it in print/JSON/RPC mode.",
+        "notes": "Because there is no approval system, isolation must come from the container/VM. In print/JSON/RPC mode, without a trust decision, project .pi resources (settings, extensions, project mcp.json) are skipped by default.",
+        "quote": "Pi does not include a built-in permission system for restricting filesystem, process, network, or credential access. By default, it runs with the permissions of the user and process that launched it.",
+        "source": "https://github.com/earendil-works/pi"
+      },
+      "json_output": {
+        "value": "`--mode json` (JSON Lines)",
+        "detail": "--mode json",
+        "quote": "`--mode json` | Run the supplied prompts, write JSONL events to stdout, then exit",
+        "source": "https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/cli.md"
+      },
+      "resume": {
+        "value": "`-c, --continue` / `--session <id>`",
+        "detail": "-c / --continue (most recent session for the project); -r / --resume (selector); --session <path|id>; --session-id <id>; --no-session for ephemeral",
+        "quote": "`-c`, `--continue`<br>\n  Continues the most recent session for the current project.",
+        "source": "https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/cli.md"
+      },
+      "model_flag": {
+        "value": "`--model provider/id`",
+        "detail": "--model <pattern> (accepts provider/id and optional :<thinking> suffix), optionally --provider <name>; --api-key <key> for a non-persistent key",
+        "quote": "Selects by exact ID or fuzzy ID/name match. It accepts `provider/id` and an optional `:<thinking>` suffix.",
+        "source": "https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/cli.md"
+      },
+      "providers": {
+        "value": "Anthropic, OpenAI, Google, GitHub Copilot, Mistral, Groq, xAI, OpenRouter, Bedrock, Vertex, Azure and more, plus any OpenAI- or Anthropic-compatible endpoint",
+        "detail": "Many hosted providers (Anthropic, OpenAI, Google Gemini, GitHub Copilot, Mistral, Groq, Cerebras, xAI, OpenRouter, Vercel AI Gateway, DeepSeek, Hugging Face, Fireworks, Together, Azure OpenAI, Amazon Bedrock, Google Vertex AI, etc.) plus custom OpenAI/Anthropic-compatible endpoints via models.json",
+        "quote": "Unified multi-provider LLM API (OpenAI, Anthropic, Google, etc.)",
+        "source": "https://github.com/earendil-works/pi"
+      },
+      "instructions_file": {
+        "value": "`AGENTS.md` or `CLAUDE.md`",
+        "detail": "AGENTS.md or CLAUDE.md (also AGENTS.override.md), from ~/.pi/agent, the working directory and parent directories; plus .pi/SYSTEM.md / .pi/APPEND_SYSTEM.md",
+        "quote": "Context files such as `AGENTS.override.md`, `AGENTS.md`, and `CLAUDE.md` load regardless of project trust unless you disable context loading.",
+        "source": "https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/security.md"
+      },
+      "config_dir": {
+        "value": "`~/.pi/agent/` (`settings.json`, `auth.json`); project `.pi/`",
+        "detail": "~/.pi/agent (override with PI_CODING_AGENT_DIR): settings.json, mcp.json, models.json, auth.json (API keys + OAuth tokens); project config in .pi/",
+        "quote": "| `<agent-dir>/auth.json` | Saved API keys and OAuth credentials. |",
+        "source": "https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/configuration.md"
+      },
+      "sandbox": {
+        "value": "None; run it in a container or VM",
+        "detail": "None built in for tool commands; docs recommend Docker, Docker Sandboxes, OpenShell or the Gondolin micro-VM extension",
+        "quote": "If you need stronger boundaries, containerize or sandbox Pi.",
+        "source": "https://github.com/earendil-works/pi"
+      },
+      "mcp": {
+        "value": "Yes: `pi mcp add`, `~/.pi/agent/mcp.json`",
+        "detail": "Yes, built-in (builtin:mcp extension). Stdio and streamable HTTP. Configure with `pi mcp add ...` or ~/.pi/agent/mcp.json / .pi/mcp.json (project file only read when trusted). Disable with --no-mcp.",
+        "quote": "Pi connects to [Model Context Protocol](https://modelcontextprotocol.io) servers over stdio or streamable HTTP and makes their tools and resources available to the model.",
+        "source": "https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/mcp.md"
+      },
+      "pricing_note": {
+        "value": "Free (MIT); you pay your model provider",
+        "detail": "Free, MIT open source; you pay your model provider (or use a subscription login). Earendil also offers Radius, an optional AI gateway in early alpha (pricing not documented in the repo).",
+        "quote": "Radius is currently in early alpha and evolving quickly.",
+        "source": "https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/providers.md"
+      },
+      "providers_short": "20+ providers, custom endpoints",
+      "server_mode": {
+        "value": "RPC mode: `pi --mode rpc` (JSON Lines over stdin/stdout), plus a TypeScript SDK",
+        "detail": "RPC mode: `pi --mode rpc --no-session` (JSONL commands on stdin, responses/events on stdout); also a TypeScript SDK. No HTTP server mode documented.",
+        "quote": "RPC mode runs Pi as a long-lived subprocess controlled through JSON records on stdin and stdout.",
+        "source": "https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/rpc.md"
+      },
+      "update_env": {
+        "value": "`PI_SKIP_VERSION_CHECK=1`, `PI_TELEMETRY=0`",
+        "detail": "PI_SKIP_VERSION_CHECK=1 (no version check), PI_TELEMETRY=0 (install/update telemetry), PI_OFFLINE=1 or --offline (no automatic network activity incl. model catalog refresh)",
+        "quote": "| `PI_SKIP_VERSION_CHECK` | Disable the `pi.dev` latest-version request |",
+        "source": "https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/environment-variables.md"
+      },
+      "auth": [
+        {
+          "method": "API key env var",
+          "env": [
+            "ANTHROPIC_API_KEY",
+            "OPENAI_API_KEY",
+            "GEMINI_API_KEY",
+            "OPENROUTER_API_KEY",
+            "MISTRAL_API_KEY",
+            "GROQ_API_KEY",
+            "XAI_API_KEY",
+            "DEEPSEEK_API_KEY",
+            "COPILOT_GITHUB_TOKEN",
+            "OPENCODE_API_KEY"
+          ],
+          "how": "export the provider's key before running pi (e.g. export ANTHROPIC_API_KEY=...; pi -p \"...\"). Check with: pi auth check --provider anthropic",
+          "quote": "Environment variables are useful in CI and anywhere Pi should not store the key.",
+          "source": "https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/providers.md"
+        },
+        {
+          "method": "subscription / OAuth login on headless",
+          "env": [],
+          "how": "Run pi interactively, use /login, choose the provider; when the OAuth callback cannot reach the remote machine, paste the final redirect URL or authorization code back into Pi. Credentials are saved to ~/.pi/agent/auth.json.",
+          "quote": "On a remote or headless machine, an OAuth callback may not reach the local process. When prompted, paste the final redirect URL or authorization code back into Pi.",
+          "source": "https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/providers.md"
+        },
+        {
+          "method": "Anthropic OAuth token env var",
+          "env": [
+            "ANTHROPIC_OAUTH_TOKEN",
+            "ANTHROPIC_AUTH_TOKEN"
+          ],
+          "how": "Set ANTHROPIC_OAUTH_TOKEN (API credential) or ANTHROPIC_AUTH_TOKEN (bearer). Pi's containerization doc generates the token with `claude setup-token`.",
+          "quote": "Anthropic also recognizes `ANTHROPIC_OAUTH_TOKEN` as an API credential and `ANTHROPIC_AUTH_TOKEN` as bearer authentication.",
+          "source": "https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/providers.md"
+        }
+      ],
+      "run": {
+        "version": "pi --version",
+        "headless": "pi -p \"<task>\"",
+        "unattended": "pi -p --model anthropic/claude-sonnet-5-5 \"Fix the failing tests\"",
+        "explain": [
+          [
+            "-p",
+            "Print mode: run the prompt, print only the final answer and exit"
+          ],
+          [
+            "--model anthropic/claude-sonnet-5-5",
+            "Provider and model. Pi has no approval prompts, so it edits and runs commands straight away"
+          ]
+        ]
+      },
+      "container": {
+        "install": "ensure_node && npm install -g --prefix \"$HOME/.npm-global\" --ignore-scripts @earendil-works/pi-coding-agent",
+        "run": "pi -p ${PI_MODEL:+--model \"$PI_MODEL\"} \"$prompt\""
+      },
+      "northflank": {
+        "native": true,
+        "harness_type": "pi",
+        "ui_label": "Pi",
+        "api_auth": "account",
+        "auth": "the harness uses account mode for Pi: run `/login` inside Pi, or add a provider key such as `ANTHROPIC_API_KEY` as a runtime variable"
+      },
+      "gotchas": [
+        {
+          "text": "npm package moved: @mariozechner/pi-coding-agent is deprecated with the message 'please use @earendil-works/pi-coding-agent instead going forward'",
+          "source": "https://www.npmjs.com/package/@mariozechner/pi-coding-agent"
+        },
+        {
+          "text": "No permission prompts and no built-in sandbox: Pi runs tools with the launching user's permissions, so run it in a container/VM",
+          "source": "https://github.com/earendil-works/pi"
+        },
+        {
+          "text": "Print, JSON and RPC modes cannot show the project-trust prompt; with the default defaultProjectTrust 'ask', project .pi resources are skipped unless you pass -a/--approve or save a trust decision",
+          "source": "https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/security.md"
+        },
+        {
+          "text": "Official Dockerfile example uses node:24-bookworm-slim plus git and ripgrep, and mounts a volume at /root/.pi/agent to persist settings, credentials and sessions",
+          "source": "https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/containerization.md"
+        },
+        {
+          "text": "JSON mode: stdout is strict JSONL; read it continuously or Pi can stall when the pipe buffer fills; diagnostics go to stderr",
+          "source": "https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/json.md"
+        },
+        {
+          "text": "Credential-printing commands (pi auth print-api-key) write secrets to stdout; be careful in CI logs",
+          "source": "https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/cli.md"
+        }
+      ],
+      "open_questions": [
+        "GitHub release tag is v1.3.0 (2026-10-15); npm @earendil-works/pi-coding-agent latest is also 1.3.0. The old @mariozechner package stops at 0.73.1.",
+        "Exact exit codes of `pi -p` on model/tool failure are not documented in the pages reviewed.",
+        "Whether the pi.dev install.sh script installs Node.js non-interactively in a minimal container was not verified."
+      ],
+      "last_verified": "2026-10-19",
+      "auth_summary": "Provider key, e.g. `ANTHROPIC_API_KEY`, or `/login`"
+    },
+    {
+      "id": "omp",
+      "name": "OMP",
+      "vendor": "Stencil Labs (by Can Bölük)",
+      "binary": "omp",
+      "summary": "Batteries-included fork of the Pi coding agent, with a native Rust core and 60+ model providers.",
+      "homepage": "https://omp.sh/",
+      "docs": "https://omp.sh/docs",
+      "repo": "https://github.com/can1357/oh-my-pi",
+      "license": {
+        "value": "MIT",
+        "open_source": true,
+        "quote": "OMP is licensed under the [MIT License](LICENSE).",
+        "source": "https://github.com/can1357/oh-my-pi/blob/main/README.md"
+      },
+      "latest_version_checked": "18.12.2 (npm @oh-my-pi/pi-coding-agent; GitHub release v18.12.2 published 2026-10-18)",
+      "install": [
+        {
+          "label": "Install script",
+          "command": "curl -fsSL https://omp.sh/install | sh",
+          "requirements": null,
+          "quote": "Without a usable bun (or with `--binary`), the install scripts fetch the prebuilt binary from `build.stencil.so` and check its SHA-256 before installing it.",
+          "source": "https://omp.sh/install"
+        },
+        {
+          "label": "bun",
+          "command": "bun install -g @oh-my-pi/pi-coding-agent",
+          "requirements": "bun 1.3.14+",
+          "quote": "**Bun (recommended)**",
+          "source": "https://github.com/can1357/oh-my-pi/blob/main/README.md"
+        }
+      ],
+      "headless_doc": {
+        "value": "omp -p \"<task>\"",
+        "detail": "omp -p \"<prompt>\"",
+        "notes": "Writes only the last assistant response to stdout after the turn completes (not streamed); 'Working...' goes to stderr. Piped/non-TTY stdin is read as the prompt and selects print mode (`echo '...' | omp -p`). Terminal turn failures give a nonzero exit. Useful extras: --no-session (ephemeral), --max-time 10m, --no-title / PI_NO_TITLE.",
+        "quote": "`--print` / `-p` runs `omp` non-interactively: it processes the prompts, writes the last assistant response to stdout, and exits without entering the TUI.",
+        "source": "https://github.com/can1357/oh-my-pi/blob/main/docs/cli-reference.md"
+      },
+      "auto_approve": {
+        "value": "Not needed: the default approval mode is `yolo`. `--yolo` makes it explicit; `--approval-mode write` or `always-ask` are stricter",
+        "detail": "Default approval mode is already `yolo` (read/write/exec all auto-approved, no prompts). To force it explicitly: `omp -p --yolo \"...\"` (alias `--auto-approve`) or `--approval-mode yolo`; config key `tools.approvalMode`.",
+        "notes": "Stricter modes: `write` (prompts for exec) and `always-ask`. Explicit tool/user deny or prompt policies still apply even under --yolo. Behaviour of a prompting tool in -p mode (no UI) is not documented in what was read.",
+        "quote": "| `yolo` (default) | `read`, `write`, `exec` | none            |",
+        "source": "https://github.com/can1357/oh-my-pi/blob/main/docs/approval-mode.md"
+      },
+      "json_output": {
+        "value": "`--mode json` (JSON Lines events)",
+        "detail": "omp -p --mode json \"<prompt>\"  (newline-delimited JSON: session header then events; `-p` optional with --mode json). Also `--mode rpc` for bidirectional NDJSON over stdio.",
+        "quote": "`--mode json` emits a session header followed by events as JSON lines.",
+        "source": "https://github.com/can1357/oh-my-pi/blob/main/docs/cli-reference.md"
+      },
+      "resume": {
+        "value": "`-c, --continue` / `-r, --resume <id>`",
+        "detail": "omp --continue (-c) continues the previous session; omp --resume <id-prefix|path> (-r) resumes a specific one (picker with no value); --fork <session> forks. Not usable with --no-session.",
+        "quote": "| `--continue`, `-c` | Continue the previous session. |",
+        "source": "https://github.com/can1357/oh-my-pi/blob/main/docs/cli-reference.md"
+      },
+      "model_flag": {
+        "value": "`--model <id>` (e.g. `openai/gpt-5.2`, `opus`)",
+        "detail": "--model <id-or-role> (e.g. `--model opus`, `--model openai/gpt-5.2`, `--model @slow`); also --smol/--slow/--plan role overrides and --thinking <level>.",
+        "quote": "| `--model <id-or-role>` | Model or configured role to use (role: `slow` or `@slow`; fuzzy model match: `opus`, `gpt-5.2`, or `openai/gpt-5.2`). |",
+        "source": "https://github.com/can1357/oh-my-pi/blob/main/docs/cli-reference.md"
+      },
+      "providers": {
+        "value": "60+ providers (Anthropic, OpenAI, Gemini, Vertex, xAI, DeepSeek, Mistral, Groq, Bedrock, Azure, OpenRouter, GitHub Copilot, Ollama and more) and custom OpenAI-compatible endpoints",
+        "detail": "60+ providers: Anthropic, OpenAI, OpenAI Codex, Gemini, Vertex, xAI, DeepSeek, Mistral, Groq, Bedrock, Azure OpenAI, OpenRouter, GitHub Copilot, Cursor, Ollama, LM Studio, llama.cpp, vLLM, LiteLLM, and custom OpenAI-compatible providers via ~/.omp/agent/models.yml.",
+        "quote": "**60+** providers · **31** built-in tools",
+        "source": "https://github.com/can1357/oh-my-pi/blob/main/README.md"
+      },
+      "instructions_file": {
+        "value": "`AGENTS.md` (also `.omp/AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, Cursor/Copilot rules)",
+        "detail": "AGENTS.md (standalone, walked up to repo root), .omp/AGENTS.md (native, highest priority), ~/.omp/agent/AGENTS.md (user); also reads CLAUDE.md, GEMINI.md, Cursor/Cline/Copilot rule files; RULES.md for sticky rules.",
+        "quote": "You never have to ask the agent to go read `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, or similar files",
+        "source": "https://github.com/can1357/oh-my-pi/blob/main/docs/context-files.md"
+      },
+      "config_dir": {
+        "value": "`~/.omp/agent/` (`config.yml`, `models.yml`, `mcp.json`); project `.omp/`",
+        "detail": "~/.omp (agent dir ~/.omp/agent: config.yml, models.yml, mcp.json, agent.db, sessions); project config in <cwd>/.omp/. Override root with PI_CONFIG_DIR, agent dir with PI_CODING_AGENT_DIR; named profiles via --profile / OMP_PROFILE.",
+        "quote": "| Global            | `~/.omp/agent/config.yml` (or existing `config.yaml`) | The main persistent settings file.",
+        "source": "https://github.com/can1357/oh-my-pi/blob/main/docs/settings.md"
+      },
+      "sandbox": {
+        "value": "None; run it in a container or VM",
+        "detail": "No OS-level sandbox for commands documented; safety is via approval tiers (always-ask / write / yolo, default yolo). Subagent tasks can use workspace isolation (worktree/overlayfs/reflink copies) but this is not a security sandbox. Run inside a container/VM for isolation.",
+        "quote": "`exec`: executes code, shells out, drives a browser, spawns agents, or performs similarly broad actions.",
+        "source": "https://github.com/can1357/oh-my-pi/blob/main/docs/approval-mode.md"
+      },
+      "mcp": {
+        "value": "Yes: `.omp/mcp.json`; imports other agents' MCP configs",
+        "detail": "Yes. Project .omp/mcp.json, user ~/.omp/agent/mcp.json; also imports MCP configs from Claude Code, Codex, Gemini CLI, OpenCode, Cursor, VS Code, and root mcp.json/.mcp.json. OMP_MCP_REQUIRE_READY=1 makes print mode fail if servers are not ready.",
+        "quote": "- Project: `.omp/mcp.json`\n- User: `~/.omp/agent/mcp.json`",
+        "source": "https://github.com/can1357/oh-my-pi/blob/main/docs/mcp-config.md"
+      },
+      "pricing_note": {
+        "value": "Free (MIT); you pay your model provider",
+        "detail": "Free, MIT-licensed open source; no paid omp plan found on official sources. You pay your chosen model provider (or use a subscription via OAuth login, or a local model).",
+        "quote": "all TypeScript, all MIT, all on [GitHub](https://github.com/can1357/oh-my-pi).",
+        "source": "https://github.com/can1357/oh-my-pi/blob/main/README.md"
+      },
+      "providers_short": "60+ providers, local",
+      "server_mode": {
+        "value": "RPC mode: `omp --mode rpc` (JSON Lines over stdio), `omp acp`, plus a Node SDK",
+        "detail": "No HTTP agent server. Programmatic modes are over stdio: `omp --mode rpc` (NDJSON commands/events) and `omp acp` (Agent Client Protocol for editors); plus a Node SDK (@oh-my-pi/pi-coding-agent). `omp auth-gateway serve` runs an HTTP forward proxy for credentials only.",
+        "quote": "`omp --mode rpc` and `omp acp` hand the wheel to another program over stdio.",
+        "source": "https://github.com/can1357/oh-my-pi/blob/main/README.md"
+      },
+      "update_env": {
+        "value": "`OTEL_SDK_DISABLED=true` for telemetry export; no documented switch for the update check",
+        "detail": "OTLP telemetry export only happens when OTEL_* endpoints are configured; disable with setting telemetry.otlpExportEnabled: false or OTEL_SDK_DISABLED=true. Auto tool-issue reporting (auto-QA) controlled by PI_AUTO_QA. Compiled binaries perform a startup update check against PI_BUILD_URL (default https://build.stencil.so); no documented env var to disable it was found. OMP_SKIP_SETUP skips interactive setup scenes; PI_NO_TITLE disables title generation.",
+        "quote": "OMP initializes OTLP export only when at least one signal has an endpoint.",
+        "source": "https://github.com/can1357/oh-my-pi/blob/main/docs/environment-variables.md"
+      },
+      "auth": [
+        {
+          "method": "Provider API key via environment variable",
+          "env": [
+            "ANTHROPIC_API_KEY",
+            "OPENAI_API_KEY",
+            "GEMINI_API_KEY",
+            "OPENROUTER_API_KEY",
+            "XAI_API_KEY",
+            "GROQ_API_KEY",
+            "MISTRAL_API_KEY",
+            "AZURE_OPENAI_API_KEY",
+            "AWS_BEARER_TOKEN_BEDROCK"
+          ],
+          "how": "Export the provider's key (or put it in ~/.omp/agent/.env, ~/.omp/.env, ~/.env or project .env, which omp loads for unset keys), then run `omp -p --model <provider/model> \"...\"`. `--api-key <key>` also accepted.",
+          "quote": "| `anthropic`      | `ANTHROPIC_OAUTH_TOKEN`, then `ANTHROPIC_API_KEY`",
+          "source": "https://github.com/can1357/oh-my-pi/blob/main/docs/providers.md"
+        },
+        {
+          "method": "OAuth/subscription token via environment variable",
+          "env": [
+            "ANTHROPIC_OAUTH_TOKEN",
+            "OPENAI_CODEX_OAUTH_TOKEN",
+            "COPILOT_GITHUB_TOKEN",
+            "CURSOR_ACCESS_TOKEN",
+            "XAI_OAUTH_TOKEN"
+          ],
+          "how": "Supply an existing OAuth token for subscription providers through these env vars; ANTHROPIC_OAUTH_TOKEN takes precedence over ANTHROPIC_API_KEY.",
+          "quote": "| `ANTHROPIC_OAUTH_TOKEN`         | Anthropic API auth                               | Using Anthropic with OAuth token auth",
+          "source": "https://github.com/can1357/oh-my-pi/blob/main/docs/environment-variables.md"
+        },
+        {
+          "method": "omp login (terminal OAuth / key login)",
+          "env": [],
+          "how": "Run `omp login <provider>` over SSH: it prints the auth URL and reads prompts from stdin; open the URL on your laptop. For flows needing a pasted callback, use `/login <redirect-url>` inside a session to complete. Credentials are stored in local agent.db.",
+          "quote": "it prints the auth URL (and opens it in your browser), reads any prompts from stdin, and saves to the same store sessions use",
+          "source": "https://github.com/can1357/oh-my-pi/blob/main/docs/providers.md"
+        },
+        {
+          "method": "Auth broker (remote credential vault)",
+          "env": [
+            "OMP_AUTH_BROKER_URL",
+            "OMP_AUTH_BROKER_TOKEN"
+          ],
+          "how": "For headless/remote fleets, point omp at a shared auth broker; manage with `omp auth-broker login <provider>`.",
+          "quote": "For headless or remote setups backed by a shared auth broker, the CLI exposes `omp auth-broker login <provider>`",
+          "source": "https://github.com/can1357/oh-my-pi/blob/main/docs/providers.md"
+        }
+      ],
+      "run": {
+        "version": "omp --version",
+        "headless": "omp -p \"<task>\"",
+        "unattended": "omp -p --yolo --model anthropic/claude-sonnet-5-5 \"Fix the failing tests\"",
+        "explain": [
+          [
+            "-p",
+            "Print mode: run the prompt, print the final answer and exit"
+          ],
+          [
+            "--yolo",
+            "Auto-approve reads, writes and commands. This is already the default; passing it guards against a config that changes it"
+          ],
+          [
+            "--model anthropic/claude-sonnet-5-5",
+            "Provider and model; any of the 60+ supported providers"
+          ]
+        ]
+      },
+      "container": {
+        "install": "curl -fsSL https://omp.sh/install | sh -s -- --binary",
+        "run": "omp -p --yolo ${OMP_MODEL:+--model \"$OMP_MODEL\"} \"$prompt\""
+      },
+      "northflank": {
+        "native": true,
+        "harness_type": "omp",
+        "ui_label": "OMP",
+        "api_auth": "account",
+        "auth": "the harness uses account mode for OMP: run `omp login <provider>` in the harness terminal, or add a provider key such as `ANTHROPIC_API_KEY` as a runtime variable"
+      },
+      "gotchas": [
+        {
+          "text": "Default approval mode is yolo, so the agent runs shell commands without prompting unless you set tools.approvalMode or --approval-mode",
+          "source": "https://github.com/can1357/oh-my-pi/blob/main/docs/approval-mode.md"
+        },
+        {
+          "text": "Starting omp in the home directory auto-switches to a temp dir unless --allow-home is passed; cd into the repo or use --cwd",
+          "source": "https://github.com/can1357/oh-my-pi/blob/main/docs/cli-reference.md"
+        },
+        {
+          "text": "The install script puts the binary in ~/.local/bin by default (PI_INSTALL_DIR overrides) and only warns if it is not on PATH",
+          "source": "https://omp.sh/install"
+        },
+        {
+          "text": "If bun is present on the host the install script installs via bun instead of the standalone binary; pass `sh -s -- --binary` to force the binary",
+          "source": "https://omp.sh/install"
+        },
+        {
+          "text": "Alpine/musl prebuilt binary needs `apk add libstdc++ libgcc`",
+          "source": "https://github.com/can1357/oh-my-pi/blob/main/README.md"
+        },
+        {
+          "text": "Print mode output arrives after the turn completes, not streamed; use --mode json for live event lines",
+          "source": "https://github.com/can1357/oh-my-pi/blob/main/docs/cli-reference.md"
+        },
+        {
+          "text": "Print mode waits for MCP servers before its first turn; set OMP_MCP_REQUIRE_READY=1 to fail fast or OMP_MCP_TIMEOUT_MS to bound waits",
+          "source": "https://github.com/can1357/oh-my-pi/blob/main/docs/environment-variables.md"
+        },
+        {
+          "text": "omp loads .env files (project, ~/.omp/agent/.env, ~/.omp/.env, ~/.env) for unset keys, so secrets can be supplied without exporting",
+          "source": "https://github.com/can1357/oh-my-pi/blob/main/docs/environment-variables.md"
+        },
+        {
+          "text": "Opening a repository loads its project settings, extensions, hooks, tools and MCP config by design; use --no-extensions / --config overlay with mcp.enableProjectConfig:false for untrusted repos",
+          "source": "https://github.com/can1357/oh-my-pi/blob/main/README.md"
+        },
+        {
+          "text": "plan.defaultOnStartup is ignored in print mode; use --plan-yolo for unattended plan-then-implement",
+          "source": "https://github.com/can1357/oh-my-pi/blob/main/docs/cli-reference.md"
+        }
+      ],
+      "open_questions": [
+        "Vendor attribution: README says 'Built by Stencil Labs'; npm author is 'Stencil Labs, Inc.'; repo lives under personal account can1357 (Can Bölük). Exact corporate relationship not documented.",
+        "No documented env var/setting found to disable the compiled binary's startup update check (update.* settings exist but specific keys were not confirmed).",
+        "What happens in -p (print) mode if a tool requires approval under always-ask/write mode (no UI to answer) is not documented in sources read.",
+        "Whether 'omp login <provider>' for Anthropic/Codex OAuth works fully over SSH without a local browser (callback-paste vs device code) varies per provider; only factory-droid is explicitly documented as device-code.",
+        "Homepage teases 'omp², soon!' — no details on a future product or pricing."
+      ],
+      "auth_summary": "Provider key, e.g. `ANTHROPIC_API_KEY`, or `omp login <provider>`",
+      "last_verified": "2026-10-19",
+      "relationship": {
+        "value": "Fork of Mario Zechner's Pi (badlogic/pi-mono), extended into a batteries-included coding agent. Not a GitHub-network fork (repo API reports fork:false) but self-described as a fork; LICENSE retains '© 2025 Mario Zechner'.",
+        "quote": "omp is a fork of [pi-mono](https://github.com/badlogic/pi-mono) by [Mario Zechner](https://github.com/mariozechner), extended with a batteries-included coding workflow.",
+        "source": "https://github.com/can1357/oh-my-pi/blob/main/README.md"
+      }
+    },
+    {
+      "id": "devin-cli",
+      "name": "Devin CLI",
+      "vendor": "Cognition",
+      "binary": "devin",
+      "summary": "Cognition's terminal coding agent (formerly Devin for Terminal), using models served through your Devin account.",
+      "homepage": "https://devin.ai/cli",
+      "docs": "https://docs.devin.ai/cli",
+      "repo": null,
+      "license": {
+        "value": "Proprietary",
+        "open_source": false,
+        "quote": null,
+        "source": "https://cli.devin.ai/install.sh"
+      },
+      "latest_version_checked": "3000.11.92 (stable, October 14, 2026); the install manifest at https://static.devin.ai/cli/current/manifest.json also reported \"version\":\"3000.11.92\" on 2026-10-19",
+      "install": [
+        {
+          "label": "Install script",
+          "command": "curl -fsSL https://cli.devin.ai/install.sh | bash",
+          "requirements": null,
+          "quote": "curl -fsSL https://cli.devin.ai/install.sh | bash",
+          "source": "https://docs.devin.ai/cli"
+        }
+      ],
+      "headless_doc": {
+        "value": "devin -p \"<task>\"",
+        "detail": "devin -p \"<prompt>\" --permission-mode <mode> --respect-workspace-trust false",
+        "notes": "-p/--print = single turn, prints response to stdout and exits. --prompt-file <FILE> loads the prompt from a file. In an untrusted directory -p fails because it cannot show the trust prompt, so pass --respect-workspace-trust false in scripts/CI. Truncated responses (max output tokens) exit non-zero in pipe mode. `devin --cloud -p` drives a Devin Cloud session instead of the local agent.",
+        "quote": "Non-interactive `--print` mode cannot show the workspace trust prompt, so it fails in an untrusted directory. Pass `--respect-workspace-trust false` to skip the check in scripts and CI.",
+        "source": "https://docs.devin.ai/cli/reference/commands"
+      },
+      "auto_approve": {
+        "value": "`--permission-mode dangerous` (alias `yolo`); safer: `accept-edits`, `smart`, or `autonomous` with `--sandbox`",
+        "detail": "--permission-mode <normal|accept-edits|smart|dangerous|autonomous> (env DEVIN_PERMISSION_MODE). Full auto-approve: --permission-mode dangerous (aliases yolo, bypass). Safer: accept-edits (auto-approve workspace file edits only), smart (fast model auto-approves actions judged safe; installs, rm, sudo, mutating git always prompt; rolling out gradually), or autonomous with --sandbox (shell/fetch auto-approved but OS sandbox enforces writable paths). Fine-grained allow/deny/ask rules in config.json `permissions`.",
+        "notes": "Org-level deny/ask rules from Team Settings still apply in bypass/smart/autonomous. In autonomous mode direct edit/write tool calls still prompt, so it is not fully unattended in -p. Smart mode may not be enabled on every account.",
+        "quote": "`--permission-mode <MODE>` | | `DEVIN_PERMISSION_MODE` | Permission mode: `normal` (alias `auto`, the default), `accept-edits`, `smart`, `dangerous` (aliases `yolo`, `bypass`), or `autonomous` (requires `--sandbox`).",
+        "source": "https://docs.devin.ai/cli/reference/commands"
+      },
+      "json_output": {
+        "value": null,
+        "detail": "No documented JSON/stream-JSON output for -p. Closest: --export [PATH] writes the conversation to a file after each turn in ATIF format; `devin list --format json`, `devin models list --format json`, `devin doctor --json` for metadata.",
+        "quote": "Export conversation to a file after each turn (ATIF format). Uses a default path if none is provided.",
+        "source": "https://docs.devin.ai/cli/reference/commands"
+      },
+      "resume": {
+        "value": "`-c` (latest) / `-r <session-id>`",
+        "detail": "devin -c (most recent session in current directory) or devin -r <SESSION_ID>; with --cloud, -r accepts a cloud session ID or URL. List sessions: devin list --format json",
+        "quote": "`--continue` | `-c` | | Resume the most recent session in the current directory |",
+        "source": "https://docs.devin.ai/cli/reference/commands"
+      },
+      "model_flag": {
+        "value": "`--model` (or `DEVIN_MODEL`)",
+        "detail": "--model <MODEL> (env DEVIN_MODEL), e.g. --model opus; short names (opus, sonnet, swe, codex, gemini) resolve to latest in family; default in config.json agent.model; list with `devin models list`",
+        "quote": "`--model <MODEL>` | | `DEVIN_MODEL` | Set the AI model for this session |",
+        "source": "https://docs.devin.ai/cli/reference/commands"
+      },
+      "providers": {
+        "value": "Models served through your Devin account: Anthropic, OpenAI, Google and Cognition's SWE models, plus open models; no documented bring-your-own-key for the CLI",
+        "detail": "Models are served through your Devin account (no documented BYOK for the local CLI): Anthropic, OpenAI, Google and Cognition (SWE) models plus open models like DeepSeek, Kimi, GLM; Adaptive router and Fusion pairings. GPT usage can be billed to a linked ChatGPT plan.",
+        "quote": "We typically support the latest and greatest models from **Anthropic**, **OpenAI**, **Google**, and **Cognition** within minutes of their launch.",
+        "source": "https://docs.devin.ai/cli/models"
+      },
+      "instructions_file": {
+        "value": "`AGENTS.md` (also `CLAUDE.md` and other tools' rule files)",
+        "detail": "AGENTS.md at project root (also AGENTS.local.md, AGENT.md, CLAUDE.md and other tools' rule files); global ~/.config/devin/AGENTS.md; also reads ~/.claude/CLAUDE.md",
+        "quote": "The simplest way to add rules is with an `AGENTS.md` file at your project root:",
+        "source": "https://docs.devin.ai/cli/extensibility/rules"
+      },
+      "config_dir": {
+        "value": "`~/.config/devin/config.json`; credentials in `~/.local/share/devin/`",
+        "detail": "User: ~/.config/devin/config.json and ~/.config/devin/mcp_config.json; project: .devin/config.json, .devin/config.local.json, .devin/mcp_config*.json; credentials and install data under ~/.local/share/devin/ (XDG_DATA_HOME); session DB relocatable with DEVIN_SESSIONS_DIR",
+        "quote": "`~/.config/devin/config.json` | User-wide settings |",
+        "source": "https://docs.devin.ai/cli/reference/configuration/config-file"
+      },
+      "sandbox": {
+        "value": "Optional (preview): bubblewrap + seccomp on Linux via `--sandbox`",
+        "detail": "[Research Preview] --sandbox (env DEVIN_SANDBOX): OS-level isolation of exec-tool processes (Linux bwrap+seccomp, macOS seatbelt). Linux needs bubblewrap and socat; fails closed (refuses to start) if unavailable. Optional domain allow/deny network filtering (marked unstable).",
+        "quote": "**Linux**: Sandboxing requires `bubblewrap` (`bwrap`) and `socat` to be installed. Sessions hard-fail with installation instructions when these are missing.",
+        "source": "https://docs.devin.ai/cli/sandbox"
+      },
+      "mcp": {
+        "value": "Yes: `devin mcp add`",
+        "detail": "Yes: stdio, Streamable HTTP (falls back to SSE). `devin mcp add <name> -- <cmd>` or `devin mcp add <name> <URL>`, scopes local/project/user; OAuth via `devin mcp login <name>`; stored in mcp_config.json files.",
+        "quote": "`devin mcp add <name>` | Add a new MCP server |",
+        "source": "https://docs.devin.ai/cli/reference/commands"
+      },
+      "pricing_note": {
+        "value": "Devin Pro, Max or Teams plan (shared usage quota); Enterprise billed in ACUs",
+        "detail": "Requires a Devin account. Self-serve Pro ($20/mo), Max ($200/mo) and Teams ($80/mo minimum, $40/full seat) plans include Devin CLI in a shared daily/weekly usage quota (the Free plan's listing does not mention the CLI). Enterprise: Devin auth is billed in ACUs against the org's Devin allocation, and users need a role with the 'Use Devin CLI' permission. Legacy Windsurf Enterprise is billed in Windsurf credits.",
+        "quote": "A daily and weekly usage quota that covers Devin sessions, [Devin CLI](/cli), and [Devin Desktop](https://windsurf.com)",
+        "source": "https://docs.devin.ai/admin/billing/self-serve"
+      },
+      "providers_short": "Models via your Devin plan",
+      "server_mode": {
+        "value": "`devin acp` (Agent Client Protocol over stdio)",
+        "detail": "`devin acp` runs Devin as an Agent Client Protocol server over stdio (JSON-RPC) for editors/IDEs; `devin worker` runs it as an Outposts self-hosted worker for Devin Cloud. No HTTP server mode documented.",
+        "quote": "Run Devin as an [Agent Client Protocol (ACP)](https://agentclientprotocol.com/) server over stdio.",
+        "source": "https://docs.devin.ai/cli/reference/commands"
+      },
+      "update_env": {
+        "value": "`\"auto_update\": false` in `~/.config/devin/config.json`",
+        "detail": "Auto-update: background self-update on macOS/Linux, disable with \"auto_update\": false in ~/.config/devin/config.json; manual `devin update`. No documented env var or setting to disable product telemetry. Optional OpenTelemetry export via `otel` config block or OTEL_EXPORTER_OTLP_* vars.",
+        "quote": "Opt out by setting `\"auto_update\": false` in `config.json`.",
+        "source": "https://docs.devin.ai/cli/changelog/stable"
+      },
+      "auth": [
+        {
+          "method": "Devin account login with manual token paste (no browser on the server)",
+          "env": [],
+          "how": "On the server run `devin auth login --force-manual-token-flow` (or `devin setup --force-manual-token-flow`), complete sign-in in a browser on another machine and paste the token. Verify with `devin auth status`. Token is stored in $XDG_DATA_HOME/devin/credentials.toml (default ~/.local/share/devin/credentials.toml).",
+          "quote": "`--force-manual-token-flow` — Skip browser-based auth and manually paste a token (useful for remote/SSH sessions)",
+          "source": "https://docs.devin.ai/cli/reference/commands"
+        },
+        {
+          "method": "Copy credentials file from an already-logged-in machine",
+          "env": [
+            "XDG_DATA_HOME"
+          ],
+          "how": "Copy credentials.toml to ~/.local/share/devin/credentials.toml (or $XDG_DATA_HOME/devin/credentials.toml) on the server; treat as a secret (mount as a secret file). Token does not expire by default.",
+          "quote": "You can copy the credentials file between your own machines to reuse the same authentication, but treat it as sensitive",
+          "source": "https://docs.devin.ai/cli/enterprise/devin-auth"
+        },
+        {
+          "method": "WINDSURF_API_KEY env var (documented for `devin acp` only)",
+          "env": [
+            "WINDSURF_API_KEY"
+          ],
+          "how": "The ACP server (`devin acp`) reads WINDSURF_API_KEY if set. Not documented as an auth method for plain `devin`/`devin -p`.",
+          "quote": "The ACP server reads credentials from `WINDSURF_API_KEY` if set, otherwise from the credentials stored by `devin auth login`.",
+          "source": "https://docs.devin.ai/cli/reference/commands"
+        }
+      ],
+      "run": {
+        "version": "devin --version",
+        "headless": "devin -p \"<task>\"",
+        "unattended": "devin -p \"Fix the failing tests\" --permission-mode dangerous \\\n  --respect-workspace-trust false",
+        "explain": [
+          [
+            "-p",
+            "Print mode: run one turn, print the response and exit"
+          ],
+          [
+            "--permission-mode dangerous",
+            "Approve every action (alias `yolo`). `accept-edits` approves file edits only"
+          ],
+          [
+            "--respect-workspace-trust false",
+            "Skip the workspace-trust prompt, which print mode can't show; without it `-p` fails in an untrusted directory"
+          ]
+        ]
+      },
+      "container": {
+        "install": "curl -fsSL https://cli.devin.ai/install.sh -o /tmp/devin-install.sh && { bash /tmp/devin-install.sh </dev/null || [ -x \"$HOME/.local/bin/devin\" ]; }",
+        "run": "devin -p \"$prompt\" --permission-mode \"${DEVIN_PERMISSION_MODE:-dangerous}\" --respect-workspace-trust false"
+      },
+      "northflank": {
+        "native": true,
+        "harness_type": "devin",
+        "ui_label": "Devin CLI",
+        "api_auth": "account",
+        "auth": "the harness uses account mode for Devin CLI: sign in to your Devin account in the harness terminal (`devin auth login --force-manual-token-flow`)"
+      },
+      "gotchas": [
+        {
+          "text": "The install script ends by running `devin setup`, an interactive auth/MCP setup wizard, so piping it in an unattended Dockerfile/provisioning step may need care.",
+          "source": "https://cli.devin.ai/install.sh"
+        },
+        {
+          "text": "The installer symlinks ~/.local/bin/devin into ~/.local/share/devin/cli/_versions/current, so ~/.local/bin must be on PATH and the data dir must persist across restarts.",
+          "source": "https://cli.devin.ai/install.sh"
+        },
+        {
+          "text": "`devin -p` fails in an untrusted directory; pass --respect-workspace-trust false in scripts and CI.",
+          "source": "https://docs.devin.ai/cli/reference/commands"
+        },
+        {
+          "text": "On a headless box, log in with `devin auth login --force-manual-token-flow`, or copy credentials.toml; the token does not expire by default, so store it as a secret.",
+          "source": "https://docs.devin.ai/cli/enterprise/devin-auth"
+        },
+        {
+          "text": "--sandbox on Linux needs bubblewrap and socat installed and refuses to start without them (fail-closed).",
+          "source": "https://docs.devin.ai/cli/sandbox"
+        },
+        {
+          "text": "Background auto-update rewrites the install on macOS/Linux; pin behavior with \"auto_update\": false in config.json for reproducible images.",
+          "source": "https://docs.devin.ai/cli/changelog/stable"
+        },
+        {
+          "text": "Agent shell commands inherit the login shell environment (.bashrc/.zshrc), so the server's shell profile affects what the agent sees.",
+          "source": "https://docs.devin.ai/cli/changelog/stable"
+        },
+        {
+          "text": "Devin CLI does not yet support Knowledge, Playbooks or Secrets from your Devin account; pass secrets via the server environment.",
+          "source": "https://docs.devin.ai/cli"
+        },
+        {
+          "text": "On legacy Windsurf Enterprise, `devin auth login` can succeed while requests fail with 'CLI access is disabled for this user' if the admin has not enabled CLI access.",
+          "source": "https://docs.devin.ai/cli/enterprise/windsurf-auth"
+        },
+        {
+          "text": "DEVIN_SESSIONS_DIR can move the session history database, e.g. off an NFS home directory.",
+          "source": "https://docs.devin.ai/cli/changelog/stable"
+        }
+      ],
+      "open_questions": [
+        "No documented env var (e.g. DEVIN_API_KEY) for authenticating plain `devin`/`devin -p`; WINDSURF_API_KEY is documented only for `devin acp`. The API auth docs list the Devin CLI under 'Best for' for Personal Access Tokens, but don't say how to pass a PAT to the CLI. Can a PAT be pasted in --force-manual-token-flow or set via env? (https://docs.devin.ai/api-reference/authentication)",
+        "The Free plan lists 'Limited Devin usage' but does not say whether Devin CLI is included.",
+        "No explicit license text found; closed-source status is inferred from binary-only distribution.",
+        "No documented way to disable product telemetry.",
+        "No structured JSON/stream-JSON stdout for -p; the ATIF export format is not spelled out on the commands page.",
+        "Whether `devin setup` at the end of install.sh blocks or skips cleanly when no TTY is attached is not documented.",
+        "cli.devin.ai/docs (older 'Devin for Terminal' page) reportedly says private preview for Enterprise customers; current docs.devin.ai self-serve docs include the CLI in Pro/Max/Teams. Treat docs.devin.ai as current."
+      ],
+      "auth_summary": "`devin auth login --force-manual-token-flow`, or a copied `credentials.toml`",
+      "last_verified": "2026-10-19"
+    },
+    {
+      "id": "aider",
+      "name": "Aider",
+      "vendor": "Paul Gauthier and contributors",
+      "binary": "aider",
+      "summary": "Open-source AI pair programmer that edits files and commits to git.",
+      "homepage": "https://aider.chat",
+      "docs": "https://aider.chat/docs/",
+      "repo": "https://github.com/Aider-AI/aider",
+      "license": {
+        "value": "Apache-2.0",
+        "open_source": true,
+        "quote": "Apache License\n                           Version 2.0, January 2004",
+        "source": "https://github.com/Aider-AI/aider/blob/main/LICENSE.txt"
+      },
+      "latest_version_checked": "0.86.2 (PyPI aider-chat; latest GitHub release tag is v0.86.0, published 2025-08-09)",
+      "install": [
+        {
+          "label": "Install script",
+          "command": "curl -LsSf https://aider.chat/install.sh | sh",
+          "requirements": null,
+          "quote": "These one-liners will install aider, along with python 3.12 if needed.",
+          "source": "https://aider.chat/docs/install.html"
+        },
+        {
+          "label": "pip",
+          "command": "python -m pip install aider-install && aider-install",
+          "requirements": null,
+          "quote": "This will install aider in its own separate python environment.",
+          "source": "https://aider.chat/docs/install.html"
+        }
+      ],
+      "headless_doc": {
+        "value": "aider --message \"<task>\"",
+        "detail": "aider --message \"<instruction>\" [files...] --yes-always",
+        "notes": "Runs the single instruction, applies the edits to the files and exits. -m/--msg are aliases. --message-file / -f reads the prompt from a file. Edits are git-committed by default.",
+        "quote": "It will do that one thing, apply the edits to the files and then exit.",
+        "source": "https://aider.chat/docs/scripting.html"
+      },
+      "auto_approve": {
+        "value": "`--yes-always`. Aider has no tool-permission system",
+        "detail": "--yes-always (env AIDER_YES_ALWAYS). Safer options: --dry-run, --no-auto-commits, --no-suggest-shell-commands, an explicit file list, --read for read-only files.",
+        "notes": "The scripting page lists the flag as `--yes`. The options reference lists `--yes-always`. Aider has no tool-permission system. It suggests shell commands rather than running tools autonomously.",
+        "quote": "Always say yes to every confirmation",
+        "source": "https://aider.chat/docs/config/options.html"
+      },
+      "json_output": {
+        "value": null,
+        "source": "https://aider.chat/docs/config/options.html"
+      },
+      "resume": {
+        "value": "`--restore-chat-history`",
+        "detail": "--restore-chat-history (restores from .aider.chat.history.md; default False)",
+        "quote": "Restore the previous chat history messages (default: False)",
+        "source": "https://aider.chat/docs/config/options.html"
+      },
+      "model_flag": {
+        "value": "`--model` (or `AIDER_MODEL`)",
+        "detail": "--model MODEL (env AIDER_MODEL)",
+        "quote": "Specify the model to use for the main chat",
+        "source": "https://aider.chat/docs/config/options.html"
+      },
+      "providers": {
+        "value": "Any provider LiteLLM supports (OpenAI, Anthropic, Gemini, DeepSeek, OpenRouter and more) and local models",
+        "detail": "Any LiteLLM-supported provider: OpenAI, Anthropic, Gemini, DeepSeek, OpenRouter, plus local models such as Ollama and OpenAI-compatible APIs",
+        "quote": "Aider uses the LiteLLM package to connect to LLM providers.",
+        "source": "https://aider.chat/docs/llms/other.html"
+      },
+      "instructions_file": {
+        "value": "None loaded automatically; pass e.g. `--read CONVENTIONS.md`",
+        "detail": "No auto-loaded file. Load a conventions file (e.g. CONVENTIONS.md) with --read or `read:` in .aider.conf.yml.",
+        "quote": "It's best to load the conventions file with `/read CONVENTIONS.md` \nor `aider --read CONVENTIONS.md`.",
+        "source": "https://aider.chat/docs/usage/conventions.html"
+      },
+      "config_dir": {
+        "value": "`.aider.conf.yml` and `.env` (home, git root, current directory)",
+        "detail": ".aider.conf.yml and .env, searched in the home dir, then git root, then cwd (later wins). Keys live in env/.env/yaml, and there is no credential store. History files (.aider.chat.history.md etc.) are written to the repo.",
+        "quote": "Most of aider's options can be set in an `.aider.conf.yml` file.",
+        "source": "https://aider.chat/docs/config/aider_conf.html"
+      },
+      "sandbox": {
+        "value": "None",
+        "detail": "None built in. An official Docker image is available.",
+        "source": "https://aider.chat/docs/install/docker.html"
+      },
+      "mcp": {
+        "value": "Not documented",
+        "source": "https://aider.chat/docs/config/options.html"
+      },
+      "pricing_note": {
+        "value": "Free (Apache-2.0); you pay your model provider",
+        "detail": "Free, open-source tool. You pay the LLM provider directly through your own API keys.",
+        "quote": "Aider lets you specify API keys in a few ways:",
+        "source": "https://aider.chat/docs/config/api-keys.html"
+      },
+      "providers_short": "Any LiteLLM provider, local",
+      "update_env": {
+        "value": "`AIDER_CHECK_UPDATE=false`",
+        "detail": "Analytics are opt-in. Disable permanently with --analytics-disable (AIDER_ANALYTICS_DISABLE=true) or per session with --no-analytics. Disable update checks with --no-check-update (AIDER_CHECK_UPDATE=false).",
+        "quote": "Analytics are only collected if you agree and opt-in.",
+        "source": "https://aider.chat/docs/more/analytics.html"
+      },
+      "auth": [
+        {
+          "method": "Provider API key env vars / .env",
+          "env": [
+            "OPENAI_API_KEY",
+            "ANTHROPIC_API_KEY",
+            "GEMINI_API_KEY",
+            "OPENROUTER_API_KEY",
+            "DEEPSEEK_API_KEY",
+            "<PROVIDER>_API_KEY"
+          ],
+          "how": "Export the provider key, put it in a .env file (home dir, git root, cwd, or --env-file), or pass --api-key provider=<key> / --openai-api-key / --anthropic-api-key. There's no Aider account or login.",
+          "quote": "Use `--api-key provider=<key>` which has the effect of setting the environment variable `PROVIDER_API_KEY=<key>`.",
+          "source": "https://aider.chat/docs/config/api-keys.html"
+        }
+      ],
+      "run": {
+        "version": "aider --version",
+        "headless": "aider --message \"<task>\"",
+        "unattended": "aider --message \"Fix the failing tests\" --yes-always --no-auto-commits",
+        "explain": [
+          [
+            "--message",
+            "Run one instruction, apply the edits and exit"
+          ],
+          [
+            "--yes-always",
+            "Answer yes to every confirmation"
+          ],
+          [
+            "--no-auto-commits",
+            "Leave changes uncommitted so your script commits them. By default Aider commits every edit"
+          ]
+        ]
+      },
+      "container": {
+        "install": "curl -LsSf https://aider.chat/install.sh | sh",
+        "run": "aider --message \"$prompt\" --yes-always --no-auto-commits --no-gitignore \\\n  --chat-history-file \"$log_dir/aider.chat.history.md\" --input-history-file \"$log_dir/aider.input.history\""
+      },
+      "northflank": {
+        "native": false,
+        "harness_type": "none"
+      },
+      "gotchas": [
+        {
+          "text": "Aider git-commits every edit by default, and commits pre-existing dirty changes first. Use --no-auto-commits / --no-dirty-commits to keep the working tree for your own pipeline",
+          "source": "https://aider.chat/docs/git.html"
+        },
+        {
+          "text": "Commits get a Co-authored-by trailer and aider author/committer attribution by default. Control this with --attribute-* flags",
+          "source": "https://aider.chat/docs/config/options.html"
+        },
+        {
+          "text": "Launched outside a git repo, Aider asks to create one. Run it inside a repo, or pass --no-git",
+          "source": "https://aider.chat/docs/git.html"
+        },
+        {
+          "text": "Pass the files to edit on the command line, because --message works on the files given",
+          "source": "https://aider.chat/docs/scripting.html"
+        },
+        {
+          "text": "In the official Docker image, run as your own UID (--user $(id -u):$(id -g)) and mount the repo at /app",
+          "source": "https://aider.chat/docs/install/docker.html"
+        },
+        {
+          "text": "The pipx install supports only Python 3.9-3.12. aider-install / uv provision Python 3.12 automatically",
+          "source": "https://aider.chat/docs/install.html"
+        },
+        {
+          "text": "Since there's no account, billing goes straight to whichever model provider's API key you use",
+          "source": "https://aider.chat/docs/config/api-keys.html"
+        }
+      ],
+      "open_questions": [
+        "The official docs don't mention MCP support.",
+        "There's no JSON or machine-readable output mode in the options reference.",
+        "It's not documented whether --yes-always auto-runs suggested shell commands in --message mode. To be safe, use --no-suggest-shell-commands.",
+        "The scripting page uses `--yes`, while the current options reference lists `--yes-always`.",
+        "The newest GitHub release (v0.86.0) is from 2025-08-09, while PyPI has 0.86.2. How actively it's maintained should be checked."
+      ],
+      "last_verified": "2026-10-19",
+      "auth_summary": "Provider key, e.g. `ANTHROPIC_API_KEY`"
+    },
+    {
+      "id": "amp",
+      "name": "Amp",
+      "vendor": "Amp (spun out of Sourcegraph)",
+      "binary": "amp",
+      "summary": "Amp's agentic coding tool (originally from Sourcegraph).",
+      "homepage": "https://ampcode.com",
+      "docs": "https://ampcode.com/docs",
+      "repo": null,
+      "license": {
+        "value": "Proprietary",
+        "open_source": false,
+        "quote": "SEE LICENSE IN LICENSE.md",
+        "source": "https://www.npmjs.com/package/@sourcegraph/amp"
+      },
+      "latest_version_checked": "0.0.1792152053-g57ff9b (npm 'latest' dist-tag of @sourcegraph/amp)",
+      "install": [
+        {
+          "label": "Install script",
+          "command": "curl -fsSL https://ampcode.com/install.sh | bash",
+          "requirements": null,
+          "quote": "The CLI supports macOS, Linux, and Windows through WSL.",
+          "source": "https://ampcode.com/docs/cli"
+        }
+      ],
+      "headless_doc": {
+        "value": "amp -x \"<task>\"",
+        "detail": "amp -x \"<prompt>\"",
+        "notes": "Sends the prompt, waits for the agent to end its turn, prints the final message to stdout, then exits. Stdin can be piped in as well. Redirecting stdout turns execute mode on automatically. Execute mode uses Standard mode unless you pass --fast. `-ox` runs the prompt in a remote orb and returns the thread URL right away.",
+        "quote": "it sends the message\nprovided to `-x` to the agent, waits until the agent ends its turn, prints its final message, and\nexits.",
+        "source": "https://ampcode.com/docs/cli/execute-mode"
+      },
+      "auto_approve": {
+        "value": "Not needed: Amp runs tools without asking. Restrict with a policy plugin",
+        "detail": "None needed. Amp runs tools without asking by default. To restrict tool use, write a custom policy plugin. amp.mcpPermissions allows or blocks MCP servers.",
+        "notes": "The current docs do not mention the --dangerously-allow-all flag from the hint. The only documented way to restrict tools is a policy plugin.",
+        "quote": "By default, Amp does not ask for approval before running tools.",
+        "source": "https://ampcode.com/docs/tools"
+      },
+      "json_output": {
+        "value": "`--stream-json` (with `-x`)",
+        "detail": "--stream-json (requires --execute); --stream-json-input for multi-turn JSONL on stdin; --stream-json-thinking",
+        "quote": "Use `--stream-json` with `--execute` to output streaming JSON instead of plain text.",
+        "source": "https://ampcode.com/docs/cli/streaming-json"
+      },
+      "resume": {
+        "value": "`amp threads continue <thread-id>`",
+        "detail": "amp threads continue [T-<thread-id>] (combinable with -x / --stream-json)",
+        "quote": "Run `amp threads continue T-…` to attach the CLI to a thread",
+        "source": "https://ampcode.com/docs/threads"
+      },
+      "model_flag": {
+        "value": null,
+        "quote": "In the CLI, press <kbd>Ctrl+S</kbd> before your first message to turn the Dial.",
+        "source": "https://ampcode.com/docs/the-dial"
+      },
+      "providers": {
+        "value": "Models served and billed by Amp, chosen per mode; can route through your own API keys or subscriptions",
+        "detail": "By default Amp serves and bills every model (Anthropic, OpenAI, and others, picked per mode via 'The Dial'). Model routing can send traffic through your own API keys (Anthropic, Google AI Studio, Meta AI, OpenAI, xAI), subscriptions (ChatGPT, Claude) or gateways.",
+        "quote": "By default Amp serves every model\nand bills your Amp credits.",
+        "source": "https://ampcode.com/docs/customize/model-routing"
+      },
+      "instructions_file": {
+        "value": "`AGENTS.md`",
+        "detail": "AGENTS.md (cwd, parent dirs, subtrees), $HOME/.config/amp/AGENTS.md, $HOME/.config/AGENTS.md, /etc/ampcode/AGENTS.md",
+        "quote": "Amp looks in `AGENTS.md` files for guidance on codebase structure, build/test commands, and conventions.",
+        "source": "https://ampcode.com/docs/customize/agents-md"
+      },
+      "config_dir": {
+        "value": "`~/.config/amp/settings.json`; workspace `.amp/settings.json`",
+        "detail": "~/.config/amp/settings.json(c) (user), nearest .amp/settings.json(c) (workspace), --settings-file <path>; managed: /etc/ampcode/managed-settings.json. Credential storage path not documented.",
+        "quote": "Linux: `~/.config/amp/settings.json` or `~/.config/amp/settings.jsonc`",
+        "source": "https://ampcode.com/docs/cli/settings"
+      },
+      "sandbox": {
+        "value": "None locally",
+        "detail": "No built-in local sandbox. The docs recommend a policy plugin or an isolated environment, or running remotely in an Amp orb (-ox).",
+        "quote": "If you\nregularly work with untrusted sources, consider creating\n[a custom policy plugin](/docs/customize/plugins), or using an isolated development environment.",
+        "source": "https://ampcode.com/docs/tools"
+      },
+      "mcp": {
+        "value": "Yes: `amp mcp add`, `--mcp-config`",
+        "detail": "yes; `amp mcp add <name> -- <cmd>` or `amp.mcpServers` in settings; per-run `--mcp-config '<json>'` with -x; remote definitions via `amp mcp remote`",
+        "quote": "Local MCP configuration is stored in `amp.mcpServers`.",
+        "source": "https://ampcode.com/docs/customize/mcp"
+      },
+      "pricing_note": {
+        "value": "Monthly tiers include usage; beyond that, prepaid credits at cost",
+        "detail": "Monthly tiers include agent usage. Past that, or with no tier, prepaid credits pay for actual model and tool usage. Amp adds no markup for individuals and non-enterprise workspaces. You can also bring your own keys or subscriptions.",
+        "quote": "Paid credits require no paid tier or commitment.",
+        "source": "https://ampcode.com/docs/pricing"
+      },
+      "providers_short": "Amp-served models; BYO keys",
+      "update_env": {
+        "value": "`AMP_SKIP_UPDATE_CHECK=1`",
+        "detail": "AMP_SKIP_UPDATE_CHECK=1 or amp.updates.mode: \"disabled\". No telemetry opt-out found.",
+        "quote": "Setting the `AMP_SKIP_UPDATE_CHECK=1`\n  environment variable overrides this setting and disables all update checks.",
+        "source": "https://ampcode.com/docs/cli/settings"
+      },
+      "auth": [
+        {
+          "method": "API key env var",
+          "env": [
+            "AMP_API_KEY"
+          ],
+          "how": "Create an access token (starts with sgamp_) at https://ampcode.com/settings/security#access-token and export AMP_API_KEY=... It takes precedence over saved accounts.",
+          "quote": "Use an access token from Settings, which starts with `sgamp_`. The CLI rejects the short-lived\nsession token that `amp login` stores",
+          "source": "https://ampcode.com/docs/cli/execute-mode"
+        },
+        {
+          "method": "interactive login",
+          "env": [],
+          "how": "`amp login` adds a saved account. The docs don't describe a browserless or device-code flow for it, so use AMP_API_KEY on servers.",
+          "quote": "Run `amp login` to add an account and make it active for the current Amp server.",
+          "source": "https://ampcode.com/docs/cli"
+        }
+      ],
+      "run": {
+        "version": "amp version",
+        "headless": "amp -x \"<task>\"",
+        "unattended": "amp -x \"Fix the failing tests\"",
+        "explain": [
+          [
+            "-x",
+            "Execute mode: send the prompt, wait for the agent to finish, print the final message and exit"
+          ],
+          [
+            "(no approval flag)",
+            "Amp runs tools, including shell commands, without asking, so run it only in an isolated environment"
+          ]
+        ]
+      },
+      "container": {
+        "install": "curl -fsSL https://ampcode.com/install.sh | bash",
+        "run": "amp -x \"$prompt\""
+      },
+      "northflank": {
+        "native": false,
+        "harness_type": "none"
+      },
+      "gotchas": [
+        {
+          "text": "Amp never asks before running tools, including shell commands. Run it in an isolated container or VM",
+          "source": "https://ampcode.com/docs/tools"
+        },
+        {
+          "text": "AMP_API_KEY must be a long-lived sgamp_ access token. The session token from `amp login` is rejected because it expires within an hour",
+          "source": "https://ampcode.com/docs/cli/execute-mode"
+        },
+        {
+          "text": "The installer symlinks amp into ~/.local/bin, so make sure that directory is on PATH",
+          "source": "https://ampcode.com/install.sh"
+        },
+        {
+          "text": "By default agent commits get 'Amp-Thread-ID' and 'Co-authored-by: Amp' trailers. Turn them off with AMP_DISABLE_AMP_THREAD_TRAILER=1 / AMP_DISABLE_AMP_COAUTHOR_TRAILER=1",
+          "source": "https://ampcode.com/docs/cli/settings"
+        },
+        {
+          "text": "Amp auto-installs updates in the background. Pin a version with AMP_SKIP_UPDATE_CHECK=1 or amp.updates.mode",
+          "source": "https://ampcode.com/docs/cli"
+        },
+        {
+          "text": "With plugins, pass --plugin-ready-timeout so execute mode waits for them to load. Otherwise agent.start/agent.end events are skipped",
+          "source": "https://ampcode.com/docs/cli/execute-mode"
+        },
+        {
+          "text": "A server can act as a 'runner' (`amp --no-tui --runner-id <id>`) that runs threads started from other clients",
+          "source": "https://ampcode.com/docs/cli"
+        }
+      ],
+      "open_questions": [
+        "The CLI docs don't mention a --dangerously-allow-all flag. The current docs say Amp never asks for approval, so the flag may have been removed or may no longer matter.",
+        "The CLI docs don't document a command-line flag for choosing the mode or model in execute mode. The UI uses the Dial (Ctrl+S).",
+        "The Homebrew install command wasn't captured because it renders client-side.",
+        "No documented exit-code semantics for `amp -x`.",
+        "Where saved login credentials are stored on disk is not documented.",
+        "It's unclear whether the npm package @sourcegraph/amp is still a supported install method, since the docs show only the script and Homebrew.",
+        "No public license text or source repo was found."
+      ],
+      "last_verified": "2026-10-19",
+      "auth_summary": "`AMP_API_KEY`"
+    },
+    {
+      "id": "copilot-cli",
+      "name": "GitHub Copilot CLI",
+      "vendor": "GitHub",
+      "binary": "copilot",
+      "summary": "GitHub Copilot's coding agent in the terminal.",
+      "homepage": "https://github.com/features/copilot/cli",
+      "docs": "https://docs.github.com/copilot/concepts/agents/about-copilot-cli",
+      "repo": "https://github.com/github/copilot-cli",
+      "license": {
+        "value": "Proprietary",
+        "open_source": false,
+        "quote": "GitHub grants you a non‑exclusive, non‑transferable, royalty‑free license to install and run copies of the GitHub Copilot CLI",
+        "source": "https://github.com/github/copilot-cli/blob/main/LICENSE.md"
+      },
+      "latest_version_checked": "1.0.98",
+      "install": [
+        {
+          "label": "Install script",
+          "command": "curl -fsSL https://gh.io/copilot-install | bash",
+          "requirements": null,
+          "quote": "Install with the install script (macOS and Linux):",
+          "source": "https://github.com/github/copilot-cli"
+        },
+        {
+          "label": "npm",
+          "command": "npm install -g @github/copilot",
+          "requirements": null,
+          "quote": "Install with [npm](https://www.npmjs.com/package/@github/copilot) (macOS, Linux, and Windows):",
+          "source": "https://github.com/github/copilot-cli"
+        }
+      ],
+      "headless_doc": {
+        "value": "copilot -p \"<task>\"",
+        "detail": "copilot -p \"<prompt>\" -s --no-ask-user --allow-tool='write, shell(git:*)'",
+        "notes": "Runs the prompt and exits when done. Prints the response to stdout. -s/--silent drops usage stats. Piping a prompt on stdin also works. The exit summary includes a `copilot --resume=SESSION-ID` hint. -p waits up to COPILOT_TASK_WAIT_TIMEOUT_SECONDS (default 600) for background tasks.",
+        "quote": "Execute a prompt programmatically (exits after completion).",
+        "source": "https://docs.github.com/en/copilot/reference/cli-command-reference"
+      },
+      "auto_approve": {
+        "value": "`--allow-all-tools` (or `--allow-all` / `--yolo`); safer: `--allow-tool='shell(git:*)'`, `--deny-tool`",
+        "detail": "--allow-all-tools (env COPILOT_ALLOW_ALL), --allow-all / --yolo (= --allow-all-tools --allow-all-paths --allow-all-urls). Safer: --allow-tool='shell(git:*)', --allow-tool=write, --deny-tool=..., --allow-url, --available-tools/--excluded-tools, plus --sandbox.",
+        "notes": "The docs recommend minimal --allow-tool grants and say to avoid --allow-all outside a sandbox. permissions.disableBypassPermissionsMode can block the allow-all options.",
+        "quote": "Allow all tools to run automatically without confirmation. Required when using the CLI programmatically (env: `COPILOT_ALLOW_ALL`).",
+        "source": "https://docs.github.com/en/copilot/reference/cli-command-reference"
+      },
+      "json_output": {
+        "value": "`--output-format=json` (JSON Lines)",
+        "detail": "--output-format=json (JSONL, one object per line)",
+        "quote": "FORMAT can be `text` (default) or `json` (outputs JSONL: one JSON object per line).",
+        "source": "https://docs.github.com/en/copilot/reference/cli-command-reference"
+      },
+      "resume": {
+        "value": "`--resume[=id]`, `--continue`",
+        "detail": "--resume[=ID|name] / -r, --continue (most recent session), --session-id ID",
+        "quote": "Resume the most recent session in the current working directory, falling back to the globally most recent session.",
+        "source": "https://docs.github.com/en/copilot/reference/cli-command-reference"
+      },
+      "model_flag": {
+        "value": "`--model=<model>`",
+        "detail": "--model=MODEL (or COPILOT_MODEL env); `auto` supported",
+        "quote": "Use `--model=MODEL` or the `COPILOT_MODEL` environment variable to select the AI model.",
+        "source": "https://docs.github.com/en/copilot/reference/cli-command-reference"
+      },
+      "providers": {
+        "value": "Copilot-hosted Claude, GPT and Gemini models; bring-your-own-key providers via `providers.json`",
+        "detail": "Copilot-hosted models (Anthropic Claude, OpenAI GPT, Google Gemini; default claude-sonnet-5.5), plus a bring-your-own-key provider registry via COPILOT_PROVIDERS_CONFIG / <COPILOT_HOME>/providers.json",
+        "quote": "Path to a JSON file that defines a bring-your-own-key (BYOK) provider and model registry",
+        "source": "https://docs.github.com/en/copilot/reference/cli-command-reference"
+      },
+      "instructions_file": {
+        "value": "`AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, `.github/copilot-instructions.md`",
+        "detail": "AGENTS.md, CLAUDE.md, GEMINI.md, .github/copilot-instructions.md, .github/instructions/**/*.instructions.md, .claude/rules/**/*.md (Git root and cwd), $HOME/.copilot/copilot-instructions.md; disable with --no-custom-instructions",
+        "quote": "Copilot CLI loads custom instructions from these locations simultaneously (all are merged):",
+        "source": "https://docs.github.com/en/copilot/reference/cli-command-reference"
+      },
+      "config_dir": {
+        "value": "`~/.copilot/`; tokens in the system keychain, or plain text under `~/.copilot/` without one",
+        "detail": "$HOME/.copilot (override COPILOT_HOME); settings ~/.copilot/settings.json; MCP ~/.copilot/mcp-config.json; logs ~/.copilot/logs/. Tokens go in the system credential store, or in a plain-text file under ~/.copilot/ if no store is found.",
+        "quote": "If a credential store is not found, the token is stored in a plain text configuration file under `~/.copilot/` (or the directory specified by `COPILOT_HOME` if set).",
+        "source": "https://docs.github.com/en/copilot/reference/cli-command-reference"
+      },
+      "sandbox": {
+        "value": "Optional: bubblewrap on Linux, off by default",
+        "detail": "Optional OS-level local sandbox, off by default. Enable with --sandbox or /sandbox enable. Linux uses bubblewrap (bwrap >= 0.5.0) plus slirp4netns.",
+        "quote": "Local sandboxing is turned off by default.",
+        "source": "https://docs.github.com/en/copilot/concepts/about-cloud-and-local-sandboxes"
+      },
+      "mcp": {
+        "value": "Yes: GitHub MCP server built in; `~/.copilot/mcp-config.json`",
+        "detail": "yes; GitHub MCP server built in; persistent servers in ~/.copilot/mcp-config.json, per-session --additional-mcp-config, `copilot mcp` subcommand; workspace MCP not loaded in -p mode unless GITHUB_COPILOT_PROMPT_MODE_WORKSPACE_MCP=true",
+        "quote": "Configure persistent servers in `~/.copilot/mcp-config.json`. Use `--additional-mcp-config` to add servers for a single session.",
+        "source": "https://docs.github.com/en/copilot/reference/cli-command-reference"
+      },
+      "pricing_note": {
+        "value": "Requires a Copilot subscription; usage draws on its AI credits",
+        "detail": "Requires an active Copilot subscription. Usage consumes AI credits based on tokens processed, varying by model.",
+        "quote": "AI credits are consumed based on the number of tokens processed.",
+        "source": "https://docs.github.com/copilot/concepts/agents/about-copilot-cli"
+      },
+      "providers_short": "Copilot models; BYO key",
+      "update_env": {
+        "value": "`COPILOT_AUTO_UPDATE=false`",
+        "detail": "COPILOT_AUTO_UPDATE=false or --no-auto-update. No telemetry opt-out found.",
+        "quote": "Set to `false` to disable automatic updates of the CLI and first-party plugins.",
+        "source": "https://docs.github.com/en/copilot/reference/cli-command-reference"
+      },
+      "auth": [
+        {
+          "method": "Token env var",
+          "env": [
+            "COPILOT_GITHUB_TOKEN",
+            "GH_TOKEN",
+            "GITHUB_TOKEN"
+          ],
+          "how": "Create a fine-grained PAT (github.com/settings/personal-access-tokens/new) with the 'Copilot Requests' permission and export it as COPILOT_GITHUB_TOKEN (checked first, then GH_TOKEN, then GITHUB_TOKEN). Classic ghp_ PATs are not supported.",
+          "quote": "The following are checked in order of precedence: `COPILOT_GITHUB_TOKEN`, `GH_TOKEN`, `GITHUB_TOKEN`. This method is most suitable for headless use such as automation.",
+          "source": "https://docs.github.com/en/copilot/reference/cli-command-reference"
+        },
+        {
+          "method": "login on headless (device code)",
+          "env": [],
+          "how": "Run `copilot login --device-code` (the default over SSH, in dev containers and in CI). Enter the shown code at github.com on any device. Or pipe a token: `copilot login --with-token < token.txt`.",
+          "quote": "On a remote terminal (for example, SSH, GitHub Codespaces, or a dev container) or in CI, the CLI defaults to the OAuth device code flow instead",
+          "source": "https://docs.github.com/en/copilot/reference/cli-command-reference"
+        }
+      ],
+      "run": {
+        "version": "copilot --version",
+        "headless": "copilot -p \"<task>\"",
+        "unattended": "copilot -p \"Fix the failing tests\" --allow-all-tools --no-ask-user",
+        "explain": [
+          [
+            "-p",
+            "Run the prompt non-interactively and exit"
+          ],
+          [
+            "--allow-all-tools",
+            "Run tools, including shell commands, without asking. Narrow it with `--allow-tool` / `--deny-tool`"
+          ],
+          [
+            "--no-ask-user",
+            "Don't stop to ask clarifying questions"
+          ]
+        ]
+      },
+      "container": {
+        "install": "curl -fsSL https://gh.io/copilot-install | bash",
+        "run": "copilot -p \"$prompt\" --allow-all-tools --no-ask-user"
+      },
+      "northflank": {
+        "native": false,
+        "harness_type": "none"
+      },
+      "gotchas": [
+        {
+          "text": "Classic PATs (ghp_) are not supported. Use a fine-grained PAT with the 'Copilot Requests' permission",
+          "source": "https://docs.github.com/en/copilot/reference/cli-command-reference"
+        },
+        {
+          "text": "With no system credential store, which is typical in containers, a token from `copilot login` is saved in plain text under ~/.copilot/",
+          "source": "https://docs.github.com/en/copilot/reference/cli-command-reference"
+        },
+        {
+          "text": "Use --no-ask-user in automation so the agent doesn't stop to ask questions",
+          "source": "https://docs.github.com/en/copilot/how-tos/copilot-cli/automate-copilot-cli/automate-with-actions"
+        },
+        {
+          "text": "In -p mode, workspace MCP servers, repo extensions and repo hooks are off by default. Opt in with GITHUB_COPILOT_PROMPT_MODE_* env vars or --trust-folder",
+          "source": "https://docs.github.com/en/copilot/reference/cli-command-reference"
+        },
+        {
+          "text": "Local sandboxing is off by default, so shell commands run with your user's full access. The Linux sandbox needs bwrap >= 0.5.0 and slirp4netns, and is switched off for the session if the host doesn't support it",
+          "source": "https://docs.github.com/en/copilot/concepts/about-cloud-and-local-sandboxes"
+        },
+        {
+          "text": "COPILOT_GITHUB_TOKEN and GITHUB_TOKEN values are redacted from output by default. Use --secret-env-vars to redact other variables from shell and MCP environments",
+          "source": "https://docs.github.com/en/copilot/reference/cli-command-reference"
+        },
+        {
+          "text": "Org or enterprise admins can disable the CLI by policy",
+          "source": "https://github.com/github/copilot-cli"
+        }
+      ],
+      "open_questions": [
+        "The README's billing text ('monthly quota of premium requests is reduced by one') conflicts with the docs, which say AI credits are charged by token. The docs look newer.",
+        "Neither the npm metadata nor the README gives a minimum Node.js version for the npm install.",
+        "The CLI reference documents no specific process exit codes.",
+        "No env var or flag to opt out of telemetry is documented. Only OpenTelemetry export is."
+      ],
+      "last_verified": "2026-10-19",
+      "auth_summary": "`COPILOT_GITHUB_TOKEN` (fine-grained PAT), or `copilot login --device-code`"
+    },
+    {
+      "id": "crush",
+      "name": "Crush",
+      "vendor": "Charm",
+      "binary": "crush",
+      "summary": "Charm's terminal coding agent.",
+      "homepage": "https://charm.land",
+      "docs": "https://github.com/charmbracelet/crush#readme",
+      "repo": "https://github.com/charmbracelet/crush",
+      "license": {
+        "value": "FSL-1.1-MIT (source-available)",
+        "open_source": false,
+        "quote": "# Functional Source License, Version 1.1, MIT Future License",
+        "source": "https://github.com/charmbracelet/crush/blob/main/LICENSE.md"
+      },
+      "latest_version_checked": "0.98.1",
+      "install": [
+        {
+          "label": "npm",
+          "command": "npm install -g @charmland/crush",
+          "requirements": null,
+          "quote": "npm install -g @charmland/crush",
+          "source": "https://github.com/charmbracelet/crush"
+        },
+        {
+          "label": "Go",
+          "command": "go install github.com/charmbracelet/crush@latest",
+          "requirements": null,
+          "quote": "Or just install it with Go:",
+          "source": "https://github.com/charmbracelet/crush"
+        }
+      ],
+      "headless_doc": {
+        "value": "crush run \"<task>\"",
+        "detail": "crush run \"<prompt>\"  (stdin is also accepted: cat file | crush run \"...\")",
+        "notes": "Runs a single prompt non-interactively and exits; output goes to stdout (redirectable). -q/--quiet hides the spinner, -v/--verbose shows logs. Fails with 'no providers configured' if no provider is set up. Documented in CLI help/source, not in the README.",
+        "quote": "Run a single prompt in non-interactive mode and exit.",
+        "source": "https://github.com/charmbracelet/crush/blob/main/internal/cmd/run.go"
+      },
+      "auto_approve": {
+        "value": "`crush run` approves every action on its own; `--yolo` exists only for the interactive UI",
+        "detail": "crush run auto-approves all permission requests for its session (no flag needed). For the interactive TUI: crush --yolo / -y, or `permissions allow <tools...>` in crushrc.",
+        "notes": "Per source code, RunNonInteractive calls AutoApproveSession for the run's session. --yolo is defined on the root command only (rootCmd.Flags, not persistent), so it is not a documented `crush run` flag. Tools can be hidden entirely with `permissions deny bash ...`.",
+        "quote": "// Automatically approve all permission requests for this non-interactive\n\t// session.\n\tapp.Permissions.AutoApproveSession(sess.ID)",
+        "source": "https://github.com/charmbracelet/crush/blob/main/internal/app/app.go"
+      },
+      "json_output": {
+        "value": null,
+        "quote": "runCmd.Flags().BoolP(\"quiet\", \"q\", false, \"Hide spinner\")",
+        "source": "https://github.com/charmbracelet/crush/blob/main/internal/cmd/run.go"
+      },
+      "resume": {
+        "value": "`crush run --continue` / `--session <id>`",
+        "detail": "crush run --continue / -C (most recent session) or --session / -s <id>; same flags on the TUI",
+        "quote": "runCmd.Flags().BoolP(\"continue\", \"C\", false, \"Continue the most recent session\")",
+        "source": "https://github.com/charmbracelet/crush/blob/main/internal/cmd/run.go"
+      },
+      "model_flag": {
+        "value": "`-m provider/model`",
+        "detail": "-m / --model <model|provider/model> (plus --small-model, --reasoning-effort) on crush run",
+        "quote": "Model to use. Accepts 'model' or 'provider/model' to disambiguate models with the same name across providers",
+        "source": "https://github.com/charmbracelet/crush/blob/main/internal/cmd/run.go"
+      },
+      "providers": {
+        "value": "Anthropic, OpenAI, Gemini, OpenRouter, Bedrock, Vertex, Azure, Groq, Charm Hyper, local models and any OpenAI- or Anthropic-compatible API",
+        "detail": "Charm Hyper (official), Anthropic, OpenAI, Gemini, OpenRouter, Vercel AI Gateway, Groq, Cerebras, Bedrock, Vertex AI, Azure OpenAI, Hugging Face, OpenCode Zen/Go, local models (Ollama, llama.cpp) and any OpenAI-/Anthropic-compatible API; model list from Catwalk",
+        "quote": "**Multi-Model:** choose from a wide range of LLMs or add your own via OpenAI- or Anthropic-compatible APIs",
+        "source": "https://github.com/charmbracelet/crush"
+      },
+      "instructions_file": {
+        "value": "`AGENTS.md`, `CRUSH.md`, `CLAUDE.md`",
+        "detail": "Project context files by default include AGENTS.md, CRUSH.md, CLAUDE.md, CLAUDE.local.md (and case variants); global ~/.config/crush/CRUSH.md and ~/.config/AGENTS.md; /init writes AGENTS.md",
+        "quote": "By\ndefault, this file is named `AGENTS.md`, but you can customize the name and\nlocation with the `initialize-as` option:",
+        "source": "https://github.com/charmbracelet/crush"
+      },
+      "config_dir": {
+        "value": "`crushrc` (project or `~/.config/crush/`); state in `~/.local/share/crush/`",
+        "detail": "./.crushrc, ./crushrc, ~/.config/crush/crushrc (legacy crush.json still supported); state in ~/.local/share/crush/crush.json; override with CRUSH_GLOBAL_CONFIG / CRUSH_GLOBAL_DATA; logs in ./.crush/logs/crush.log",
+        "quote": "| 3        | `~/.config/crush/crushrc` | `%USERPROFILE%\\.config\\crush\\crushrc` |",
+        "source": "https://github.com/charmbracelet/crush"
+      },
+      "sandbox": {
+        "value": "None; permission rules only",
+        "detail": "None documented; permission prompts / allow-deny lists only",
+        "quote": "By default, Crush will ask you for permission before running tool calls.",
+        "source": "https://github.com/charmbracelet/crush"
+      },
+      "mcp": {
+        "value": "Yes: stdio, HTTP and SSE",
+        "detail": "Yes: stdio, http and sse via `mcp add ...` in crushrc (or mcp key in legacy JSON), with OAuth support",
+        "quote": "**Extensible:** add capabilities via MCPs (`http`, `stdio`, and `sse`)",
+        "source": "https://github.com/charmbracelet/crush"
+      },
+      "pricing_note": {
+        "value": "Free with your own provider keys; optional Charm Hyper subscription",
+        "detail": "Free to use with your own provider keys; Charm also offers Hyper, a subscription provider with a free tier.",
+        "quote": "It’s subscription-based,\nwith a free tier, and optimized for Crush.",
+        "source": "https://github.com/charmbracelet/crush"
+      },
+      "providers_short": "Many providers, local",
+      "server_mode": {
+        "value": "`crush server`",
+        "detail": "`crush server` (starts the Crush server; TUIs/clients connect, -H/--host for TCP or Unix socket); clients sharing a --cwd share a workspace",
+        "quote": "When Crush is run against a shared backend (for example two TUIs talking to\nthe same `crush serve`), clients are grouped into **workspaces** keyed by\ntheir resolved `--cwd`.",
+        "source": "https://github.com/charmbracelet/crush"
+      },
+      "update_env": {
+        "value": "`CRUSH_DISABLE_METRICS=1` or `DO_NOT_TRACK=1`",
+        "detail": "CRUSH_DISABLE_METRICS=1 or DO_NOT_TRACK=1 (metrics); CRUSH_DISABLE_PROVIDER_AUTO_UPDATE=1 (provider catalog auto-update)",
+        "quote": "export CRUSH_DISABLE_METRICS=1",
+        "source": "https://github.com/charmbracelet/crush"
+      },
+      "auth": [
+        {
+          "method": "API key env var",
+          "env": [
+            "ANTHROPIC_API_KEY",
+            "OPENAI_API_KEY",
+            "GEMINI_API_KEY",
+            "OPENROUTER_API_KEY",
+            "HYPER_API_KEY",
+            "GROQ_API_KEY",
+            "VERCEL_API_KEY",
+            "OPENCODE_API_KEY",
+            "AWS_ACCESS_KEY_ID",
+            "AWS_SECRET_ACCESS_KEY",
+            "AWS_REGION",
+            "AZURE_OPENAI_API_KEY",
+            "VERTEXAI_PROJECT",
+            "VERTEXAI_LOCATION",
+            "AWS_PROFILE",
+            "AWS_BEARER_TOKEN_BEDROCK",
+            "HF_TOKEN"
+          ],
+          "how": "Export the provider's env var before running crush/crush run; no browser needed.",
+          "quote": "That said, you can also set environment variables for preferred providers:",
+          "source": "https://github.com/charmbracelet/crush"
+        },
+        {
+          "method": "crushrc provider definition",
+          "env": [],
+          "how": "Define a provider in ~/.config/crush/crushrc with `provider add <id> --type ... --base-url ... --api-key \"$(...)\"` (Bash-based config).",
+          "quote": "A `crushrc` is just Bash with some Crush-specific builtins.",
+          "source": "https://github.com/charmbracelet/crush"
+        },
+        {
+          "method": "subscription / platform login",
+          "env": [],
+          "how": "`crush login [hyper|copilot|openai|grok]`. Whether these flows work without a local browser is not documented.",
+          "quote": "Available platforms are: hyper, copilot, openai (chatgpt), grok (xai).",
+          "source": "https://github.com/charmbracelet/crush/blob/main/internal/cmd/login.go"
+        }
+      ],
+      "run": {
+        "version": "crush --version",
+        "headless": "crush run \"<task>\"",
+        "unattended": "crush run -q \"Fix the failing tests\"",
+        "explain": [
+          [
+            "run",
+            "Run one prompt non-interactively. It approves every permission request for that run"
+          ],
+          [
+            "-q",
+            "Hide the spinner, so output is clean in logs"
+          ]
+        ]
+      },
+      "container": {
+        "install": "ensure_node && npm install -g --prefix \"$HOME/.npm-global\" @charmland/crush",
+        "run": "crush run -q ${CRUSH_MODEL:+-m \"$CRUSH_MODEL\"} \"$prompt\""
+      },
+      "northflank": {
+        "native": false,
+        "harness_type": "none"
+      },
+      "gotchas": [
+        {
+          "text": "crush run errors with 'no providers configured - please run 'crush' to set up a provider interactively' when nothing is configured; set a provider env var or crushrc first",
+          "source": "https://github.com/charmbracelet/crush/blob/main/internal/cmd/run.go"
+        },
+        {
+          "text": "crushrc runs as full Bash and $(...) in crush.json executes at load time; don't run Crush in a cloned repo whose .crushrc you haven't reviewed",
+          "source": "https://github.com/charmbracelet/crush"
+        },
+        {
+          "text": "License is FSL-1.1-MIT (source-available, not OSI open source until the MIT conversion)",
+          "source": "https://github.com/charmbracelet/crush/blob/main/LICENSE.md"
+        },
+        {
+          "text": "Pseudonymous usage metrics are on by default; disable with CRUSH_DISABLE_METRICS=1 or DO_NOT_TRACK=1",
+          "source": "https://github.com/charmbracelet/crush"
+        },
+        {
+          "text": "Provider list auto-updates from Catwalk; disable with CRUSH_DISABLE_PROVIDER_AUTO_UPDATE=1 for offline/air-gapped containers",
+          "source": "https://github.com/charmbracelet/crush"
+        },
+        {
+          "text": "With a shared `crush serve` backend, --yolo is first-wins per workspace",
+          "source": "https://github.com/charmbracelet/crush"
+        }
+      ],
+      "open_questions": [
+        "`crush run` flags and its auto-approval behaviour are only documented in source/--help, not the README; re-verify with `crush run --help` on the pinned version.",
+        "No JSON / machine-readable output flag found for `crush run`.",
+        "Whether `crush login` (hyper/copilot/openai/grok) works without a browser on a headless server is not documented.",
+        "Exact file where API keys entered via the TUI/`crush login` are stored (likely the global data config ~/.local/share/crush/crush.json) is not explicitly documented.",
+        "README calls it `crush serve` in one place while the command defined in source is `crush server`."
+      ],
+      "last_verified": "2026-10-19",
+      "auth_summary": "Provider key, e.g. `ANTHROPIC_API_KEY`"
+    },
+    {
+      "id": "droid",
+      "name": "Factory Droid",
+      "vendor": "Factory",
+      "binary": "droid",
+      "summary": "Factory's coding agent CLI.",
+      "homepage": "https://factory.ai",
+      "docs": "https://docs.factory.com/droid-cli/overview",
+      "repo": null,
+      "license": {
+        "value": "Proprietary",
+        "open_source": false,
+        "quote": "UNLICENSED",
+        "source": "https://www.npmjs.com/package/droid"
+      },
+      "latest_version_checked": "0.243.0",
+      "install": [
+        {
+          "label": "npm",
+          "command": "npm install -g droid",
+          "requirements": "Node.js 20+",
+          "quote": "**npm:** `npm install -g droid`",
+          "source": "https://docs.factory.com/droid-cli/quickstart"
+        },
+        {
+          "label": "Install script",
+          "command": "curl -fsSL https://app.factory.ai/cli | sh",
+          "requirements": null,
+          "quote": "**macOS/Linux:** `curl -fsSL https://app.factory.ai/cli | sh`",
+          "source": "https://docs.factory.com/droid-cli/quickstart"
+        }
+      ],
+      "headless_doc": {
+        "value": "droid exec \"<task>\"",
+        "detail": "droid exec --auto low \"<prompt>\"  (also: droid exec -f prompt.md, or pipe stdin)",
+        "notes": "One-shot run that writes to stdout/stderr and exits. Read-only by default. If an action needs more autonomy than allowed, it exits non-zero without making partial changes.",
+        "quote": "`droid exec` runs as a one-shot command that completes a task and exits",
+        "source": "https://docs.factory.com/droid-exec/overview"
+      },
+      "auto_approve": {
+        "value": "`droid exec --auto low|medium|high`; `--skip-permissions-unsafe` for disposable environments. Read-only by default",
+        "detail": "--auto low|medium|high (tiered); --skip-permissions-unsafe skips all prompts (disposable environments only; cannot combine with --auto). Default with no flag is read-only.",
+        "notes": "low allows file edits. medium adds installs, builds, tests and local git commits. high adds git push, deploys and migrations. Permission-rule blocks still apply even with --skip-permissions-unsafe. Preview them with `droid rules check`.",
+        "quote": "The default is spec-mode, where the agent is only allowed to execute read-only operations; add `--auto` to enable edits and commands, with risk tiers gating what can run.",
+        "source": "https://docs.factory.com/droid-exec/overview"
+      },
+      "json_output": {
+        "value": "`-o json` or `stream-json`",
+        "detail": "-o/--output-format json | stream-json | stream-jsonrpc",
+        "quote": "Output format (`text`, `json`, `stream-json`, `stream-jsonrpc`)",
+        "source": "https://docs.factory.com/droid-cli/cli-reference"
+      },
+      "resume": {
+        "value": "`droid exec -s <session-id>`",
+        "detail": "exec: -s/--session-id <id> \"<prompt>\" or --fork <id>; interactive: droid --resume [sessionId] / -r",
+        "quote": "droid exec --session-id <session-id> \"continue with next steps\"",
+        "source": "https://docs.factory.com/droid-exec/overview"
+      },
+      "model_flag": {
+        "value": "`-m, --model`",
+        "detail": "-m/--model <id> (plus --spec-model, -r/--reasoning-effort in exec)",
+        "quote": "Select a specific [model ID](/models)",
+        "source": "https://docs.factory.com/droid-cli/cli-reference"
+      },
+      "providers": {
+        "value": "Factory-hosted models (Anthropic, OpenAI and others); bring-your-own models in `~/.factory/settings.json`",
+        "detail": "Factory-hosted models (Anthropic, OpenAI and others, by model ID), plus custom BYOK models (e.g. OpenAI-compatible baseUrl/apiKey) in ~/.factory/settings.json",
+        "quote": "You can configure custom models to use with droid exec by adding them to your `~/.factory/settings.json` file:",
+        "source": "https://docs.factory.com/droid-exec/overview"
+      },
+      "instructions_file": {
+        "value": "`AGENTS.md` (also `CLAUDE.md`)",
+        "detail": "AGENTS.md (also agents.md, Agents.md, CLAUDE.md, Claude.md), searched from cwd up to the git root, including .factory/, .agents/, .agent/; personal ~/.factory/ etc.",
+        "quote": "Use `AGENTS.md` for new guidance. Droid also reads compatible filenames so existing instruction files from other coding tools keep working.",
+        "source": "https://docs.factory.com/harness/agents-md"
+      },
+      "config_dir": {
+        "value": "`~/.factory/settings.json`; project `.factory/`",
+        "detail": "~/.factory/settings.json (+ settings.local.json), project .factory/; MCP in ~/.factory/mcp.json and .factory/mcp.json; --settings <path> per process. Login tokens are stored encrypted with OS-level file permissions (no path given).",
+        "quote": "| macOS / Linux | `~/.factory/settings.json`             |",
+        "source": "https://docs.factory.com/droid-cli/settings"
+      },
+      "sandbox": {
+        "value": "Optional: bubblewrap + seccomp on Linux",
+        "detail": "Optional OS-level sandbox, turned on with sandbox.enabled=true. Linux and WSL2 use bubblewrap plus seccomp. Mode is per-command (default) or whole-process. Network is limited to allowed domains. If isolation isn't available, commands are blocked rather than run unsandboxed.",
+        "quote": "**Linux and WSL2**: [bubblewrap](https://github.com/containers/bubblewrap) with a seccomp filter provides the same confinement.",
+        "source": "https://docs.factory.com/autonomy-and-safety/sandbox"
+      },
+      "mcp": {
+        "value": "Yes: `droid mcp add`, `.factory/mcp.json`",
+        "detail": "yes; `droid mcp add <name> \"<command>\"` / `droid mcp add <name> <url>`; mcp.json at user (~/.factory/mcp.json), folder and project (.factory/mcp.json) levels",
+        "quote": "MCP server configurations are stored in `mcp.json` files at three levels:",
+        "source": "https://docs.factory.com/harness/mcp"
+      },
+      "pricing_note": {
+        "value": "Factory Pro, Plus or Max plan",
+        "detail": "Individual plans Pro $20/mo, Plus $100/mo, Max $200/mo all include Droid CLI, with rolling rate limits and prepaid Extra Usage. Org plans are separate.",
+        "quote": "Pro, Plus, and Max include the Factory App, Droid CLI, and Droid SDK, with usage governed by rolling Rate Limits.",
+        "source": "https://docs.factory.com/pricing/individuals"
+      },
+      "providers_short": "Factory models; BYO key",
+      "update_env": {
+        "value": "`FACTORY_DROID_AUTO_UPDATE_ENABLED=false` (npm builds don't auto-update)",
+        "detail": "FACTORY_DROID_AUTO_UPDATE_ENABLED=false (standalone install). npm builds have auto-update off. No telemetry opt-out found.",
+        "quote": "export FACTORY_DROID_AUTO_UPDATE_ENABLED=false",
+        "source": "https://docs.factory.com/droid-cli/cli-reference"
+      },
+      "auth": [
+        {
+          "method": "API key env var",
+          "env": [
+            "FACTORY_API_KEY"
+          ],
+          "how": "Generate a key at https://app.factory.ai/settings/api-keys and export FACTORY_API_KEY=fk-...",
+          "quote": "export FACTORY_API_KEY=fk-...",
+          "source": "https://docs.factory.com/droid-cli/cli-reference"
+        }
+      ],
+      "run": {
+        "version": "droid --version",
+        "headless": "droid exec \"<task>\"",
+        "unattended": "droid exec --auto medium \"Fix the failing tests\"",
+        "explain": [
+          [
+            "exec",
+            "One-shot run that exits when done. Read-only unless you pass `--auto`"
+          ],
+          [
+            "--auto medium",
+            "Allow edits, installs, builds, tests and local commits. `low` allows edits only; `high` adds pushes and deploys"
+          ]
+        ]
+      },
+      "container": {
+        "install": "ensure_node && npm install -g --prefix \"$HOME/.npm-global\" droid",
+        "run": "droid exec --auto \"${DROID_AUTO:-medium}\" \"$prompt\""
+      },
+      "northflank": {
+        "native": false,
+        "harness_type": "none"
+      },
+      "gotchas": [
+        {
+          "text": "droid exec is read-only unless you pass --auto. Use --auto low for edits and --auto medium for installs, tests and commits",
+          "source": "https://docs.factory.com/droid-exec/overview"
+        },
+        {
+          "text": "Permission rules that resolve to 'ask' can't be approved in a one-shot run, even with --auto high. Rule blocks apply even with --skip-permissions-unsafe",
+          "source": "https://docs.factory.com/droid-exec/overview"
+        },
+        {
+          "text": "Use --skip-permissions-unsafe only in disposable containers, VMs or ephemeral CI runners. The docs show a docker run alpine example",
+          "source": "https://docs.factory.com/droid-exec/overview"
+        },
+        {
+          "text": "Standalone installs auto-update. Pin them with FACTORY_DROID_AUTO_UPDATE_ENABLED=false and `droid update --version X`, or install a pinned npm version",
+          "source": "https://docs.factory.com/droid-cli/cli-reference"
+        },
+        {
+          "text": "The docs recommend installing xdg-utils on Linux",
+          "source": "https://docs.factory.com/droid-cli/quickstart"
+        },
+        {
+          "text": "With the sandbox on and per-command mode, a command is blocked, not run unsandboxed, when bubblewrap or seccomp isn't available",
+          "source": "https://docs.factory.com/autonomy-and-safety/sandbox"
+        },
+        {
+          "text": "In `droid exec`, -r means --reasoning-effort, not --resume",
+          "source": "https://docs.factory.com/droid-cli/cli-reference"
+        }
+      ],
+      "open_questions": [
+        "Docs have moved from docs.factory.ai to docs.factory.com. Both links appear in the docs; install URLs still use app.factory.ai.",
+        "There is no documented browserless or device-code login. Interactive sign-in uses the browser, so use FACTORY_API_KEY on servers.",
+        "No env var for disabling telemetry was found in the CLI docs. An enterprise telemetry page exists but wasn't checked.",
+        "The npm metadata points at a repo (github.com/Factory-AI/factory) that may not be public. The license is UNLICENSED."
+      ],
+      "last_verified": "2026-10-19",
+      "auth_summary": "`FACTORY_API_KEY`"
+    },
+    {
+      "id": "gemini-cli",
+      "name": "Gemini CLI",
+      "vendor": "Google",
+      "binary": "gemini",
+      "summary": "Google's open-source terminal agent for Gemini models.",
+      "homepage": "https://geminicli.com",
+      "docs": "https://www.geminicli.com/docs/",
+      "repo": "https://github.com/google-gemini/gemini-cli",
+      "license": {
+        "value": "Apache-2.0",
+        "open_source": true,
+        "quote": "Apache License 2.0",
+        "source": "https://github.com/google-gemini/gemini-cli"
+      },
+      "latest_version_checked": "0.64.0",
+      "install": [
+        {
+          "label": "npm",
+          "command": "npm install -g @google/gemini-cli",
+          "requirements": "Node.js 20+",
+          "quote": "npm install -g @google/gemini-cli",
+          "source": "https://github.com/google-gemini/gemini-cli"
+        }
+      ],
+      "headless_doc": {
+        "value": "gemini -p \"<task>\"",
+        "detail": "gemini -p \"<prompt>\" (also triggered automatically in a non-TTY environment; -p is appended to stdin input if provided)",
+        "notes": "Exit codes: 0 success, 1 general/API error, 42 input error, 53 turn limit exceeded.",
+        "quote": "Prompt text. Appended to stdin input if provided. Forces non-interactive mode.",
+        "source": "https://geminicli.com/docs/cli/cli-reference/"
+      },
+      "auto_approve": {
+        "value": "`--approval-mode=yolo`; safer: `--approval-mode=auto_edit`. `--yolo` is deprecated",
+        "detail": "--approval-mode=yolo (auto-approve all). Safer: --approval-mode=auto_edit (auto-approve edits), --approval-mode=plan, or Policy Engine rules. --yolo/-y still exists but is deprecated; --allowed-tools is deprecated in favor of the Policy Engine.",
+        "notes": "Combine with --sandbox / GEMINI_SANDBOX for isolation.",
+        "quote": "Approval mode for tool execution. Choices: `default`, `auto_edit`, `yolo`, `plan`",
+        "source": "https://geminicli.com/docs/cli/cli-reference/"
+      },
+      "json_output": {
+        "value": "`--output-format json` or `stream-json`",
+        "detail": "--output-format json (single object with response, stats, optional error) or --output-format stream-json (JSONL events)",
+        "quote": "The format of the CLI output. Choices: `text`, `json`, `stream-json`",
+        "source": "https://geminicli.com/docs/cli/cli-reference/"
+      },
+      "resume": {
+        "value": "`--resume latest`",
+        "detail": "--resume latest | --resume <index> (list with --list-sessions)",
+        "quote": "Resume a previous session. Use `\"latest\"` for most recent or index number (for example `--resume 5`)",
+        "source": "https://geminicli.com/docs/cli/cli-reference/"
+      },
+      "model_flag": {
+        "value": "`-m, --model`",
+        "detail": "--model / -m <model> (default auto); env GEMINI_MODEL",
+        "quote": "Model to use.",
+        "source": "https://geminicli.com/docs/cli/cli-reference/"
+      },
+      "providers": {
+        "value": "Gemini models only, via the Gemini API, Vertex AI or Code Assist",
+        "detail": "Google Gemini models only (via Gemini API or Vertex AI / Gemini Enterprise Agent Platform, or Code Assist licenses).",
+        "quote": "Gemini CLI will remain accessible via paid Gemini and Gemini Enterprise Agent Platform API keys.",
+        "source": "https://developers.googleblog.com/an-important-update-transitioning-gemini-cli-to-antigravity-cli"
+      },
+      "instructions_file": {
+        "value": "`GEMINI.md` (add `AGENTS.md` via `context.fileName`)",
+        "detail": "GEMINI.md by default (hierarchical); configurable via context.fileName (string or array; docs example [\"CONTEXT.md\", \"GEMINI.md\"]) — add AGENTS.md there to read it.",
+        "quote": "context files (defaulting to `GEMINI.md` but configurable via the `context.fileName` setting)",
+        "source": "https://geminicli.com/docs/reference/configuration/"
+      },
+      "config_dir": {
+        "value": "`~/.gemini/settings.json` and `~/.gemini/.env`",
+        "detail": "~/.gemini/ (settings.json, .env); project .gemini/settings.json; root overridable with GEMINI_CLI_HOME. Cached OAuth credential location not stated in fetched docs.",
+        "quote": "`~/.gemini/settings.json` (where `~` is your home directory).",
+        "source": "https://geminicli.com/docs/reference/configuration/"
+      },
+      "sandbox": {
+        "value": "Optional: Docker, Podman, gVisor or Seatbelt (`--sandbox`)",
+        "detail": "Off unless enabled: -s/--sandbox, GEMINI_SANDBOX=true|docker|podman|sandbox-exec|runsc|lxc, or tools.sandbox in settings. macOS Seatbelt (sandbox-exec), Docker/Podman, gVisor/runsc (Linux), LXC/LXD (experimental).",
+        "quote": "Cross-platform sandboxing with complete process isolation using container technology.",
+        "source": "https://geminicli.com/docs/cli/sandbox/"
+      },
+      "mcp": {
+        "value": "Yes: `gemini mcp add`, `mcpServers` in settings",
+        "detail": "Yes. gemini mcp add [options] <name> <commandOrUrl> [args...], or mcpServers in ~/.gemini/settings.json",
+        "quote": "Gemini CLI uses the mcpServers configuration in your settings.json file to locate and connect to MCP servers.",
+        "source": "https://geminicli.com/docs/tools/mcp-server/"
+      },
+      "pricing_note": {
+        "value": "Gemini API key (pay-as-you-go), Vertex AI, or Code Assist Standard/Enterprise. Free Google sign-in moved to Antigravity CLI",
+        "detail": "Gemini API key: free tier 250 requests/user/day (Flash only) or pay-as-you-go; Vertex AI pay-as-you-go (Express Mode free 90 days); Code Assist Standard 1500/day, Enterprise 2000/day. Free Google-login / Google One access moved to Antigravity CLI on June 18, 2026.",
+        "quote": "250 maximum model requests / user / day",
+        "source": "https://geminicli.com/docs/resources/quota-and-pricing/"
+      },
+      "providers_short": "Gemini only",
+      "update_env": {
+        "value": "`general.enableAutoUpdate: false` in `settings.json`",
+        "detail": "Settings (not env): general.enableAutoUpdate=false, privacy.usageStatisticsEnabled=false in ~/.gemini/settings.json. Telemetry (OTel) is opt-in via telemetry.enabled or GEMINI_TELEMETRY_ENABLED.",
+        "quote": "Enable collection of usage statistics",
+        "source": "https://geminicli.com/docs/reference/configuration/"
+      },
+      "auth": [
+        {
+          "method": "Gemini API key (Google AI Studio)",
+          "env": [
+            "GEMINI_API_KEY"
+          ],
+          "how": "export GEMINI_API_KEY=...; headless runs use env vars when no cached credential exists. Can also be placed in .env (searched upward from cwd, then ~/.gemini/.env; first file found wins).",
+          "quote": "export GEMINI_API_KEY=\"YOUR_API_KEY\"",
+          "source": "https://github.com/google-gemini/gemini-cli"
+        },
+        {
+          "method": "Vertex AI with service account JSON key (recommended for CI/non-interactive)",
+          "env": [
+            "GOOGLE_CLOUD_PROJECT",
+            "GOOGLE_CLOUD_LOCATION",
+            "GOOGLE_APPLICATION_CREDENTIALS",
+            "GOOGLE_GENAI_USE_VERTEXAI"
+          ],
+          "how": "Unset GOOGLE_API_KEY and GEMINI_API_KEY; create service account with 'Vertex AI User' role; export GOOGLE_APPLICATION_CREDENTIALS=/abs/path/key.json, GOOGLE_CLOUD_PROJECT, GOOGLE_CLOUD_LOCATION. README also shows GOOGLE_GENAI_USE_VERTEXAI=true.",
+          "quote": "export GOOGLE_CLOUD_PROJECT=\"YOUR_PROJECT_ID\"",
+          "source": "https://geminicli.com/docs/get-started/authentication/"
+        },
+        {
+          "method": "Vertex AI with Google Cloud API key",
+          "env": [
+            "GOOGLE_API_KEY",
+            "GOOGLE_GENAI_USE_VERTEXAI",
+            "GOOGLE_CLOUD_PROJECT",
+            "GOOGLE_CLOUD_LOCATION"
+          ],
+          "how": "export GOOGLE_API_KEY=... and GOOGLE_GENAI_USE_VERTEXAI=true",
+          "quote": "export GOOGLE_GENAI_USE_VERTEXAI=true",
+          "source": "https://github.com/google-gemini/gemini-cli"
+        },
+        {
+          "method": "Google Cloud metadata / ADC (Compute Engine, Cloud Shell)",
+          "env": [],
+          "how": "On Compute Engine, Gemini CLI uses Application Default Credentials from the metadata server; Cloud Shell is automatic.",
+          "quote": "Headless mode will use your existing authentication method, if an existing authentication credential is cached.",
+          "source": "https://geminicli.com/docs/get-started/authentication/"
+        },
+        {
+          "method": "Sign in with Google (OAuth) — needs a browser; for paid Code Assist licenses set GOOGLE_CLOUD_PROJECT",
+          "env": [
+            "GOOGLE_CLOUD_PROJECT"
+          ],
+          "how": "Not browser-free. Unpaid tier and Google One users were moved to Antigravity CLI on June 18, 2026.",
+          "quote": "This method requires a web browser on a machine that can communicate with the terminal running Gemini CLI.",
+          "source": "https://geminicli.com/docs/get-started/authentication/"
+        }
+      ],
+      "run": {
+        "version": "gemini --version",
+        "headless": "gemini -p \"<task>\"",
+        "unattended": "gemini -p \"Fix the failing tests\" --approval-mode=yolo",
+        "explain": [
+          [
+            "-p",
+            "Headless mode: run the prompt and exit. Exit codes: 0 success, 1 error, 42 input error, 53 turn limit"
+          ],
+          [
+            "--approval-mode=yolo",
+            "Approve every tool call. Use `auto_edit` to approve only file edits"
+          ]
+        ]
+      },
+      "container": {
+        "install": "ensure_node && npm install -g --prefix \"$HOME/.npm-global\" @google/gemini-cli",
+        "run": "gemini -p \"$prompt\" --approval-mode=\"${GEMINI_APPROVAL_MODE:-yolo}\""
+      },
+      "northflank": {
+        "native": false,
+        "harness_type": "none"
+      },
+      "gotchas": [
+        {
+          "text": "Unpaid tier and Google One users: Gemini CLI was replaced by Antigravity CLI on June 18th, 2026; Google AI Pro/Ultra and Code Assist for individuals stop being served",
+          "source": "https://github.com/google-gemini/gemini-cli"
+        },
+        {
+          "text": "Gemini CLI is not optimized for Gemini 4 Argon; Google points to Antigravity for that model",
+          "source": "https://github.com/google-gemini/gemini-cli"
+        },
+        {
+          "text": "Sign in with Google needs a browser that can reach the terminal; on servers use GEMINI_API_KEY or Vertex service account",
+          "source": "https://geminicli.com/docs/get-started/authentication/"
+        },
+        {
+          "text": "For Vertex ADC/service-account auth, unset GOOGLE_API_KEY and GEMINI_API_KEY, which interfere",
+          "source": "https://geminicli.com/docs/get-started/authentication/"
+        },
+        {
+          "text": ".env is loaded from the first file found walking up from cwd, then ~/.gemini/.env; not merged",
+          "source": "https://geminicli.com/docs/get-started/authentication/"
+        },
+        {
+          "text": "Docker sandbox from inside a container requires sharing the host Docker socket and matching workspace paths",
+          "source": "https://geminicli.com/docs/cli/sandbox/"
+        },
+        {
+          "text": "Headless exit code 53 means turn limit exceeded, 42 input error",
+          "source": "https://geminicli.com/docs/cli/headless/"
+        },
+        {
+          "text": "general.enableAutoUpdate defaults to true; disable in images",
+          "source": "https://geminicli.com/docs/reference/configuration/"
+        }
+      ],
+      "open_questions": [
+        "Google blog says Gemini CLI remains accessible via PAID Gemini API keys; the quota page still lists a free (unpaid) API-key tier of 250/day. Whether free AI Studio API keys still work after June 18, 2026 is unclear.",
+        "Quota page still lists Code Assist Individual / AI Pro / Ultra quotas despite the blog saying those stop being served — page appears stale.",
+        "Long-term maintenance status of the open-source Gemini CLI is not stated; Antigravity CLI command name/install not captured (antigravity.google/docs/gcli-migration).",
+        "NO_BROWSER env var and cached OAuth credential path not confirmed in fetched docs.",
+        "GOOGLE_GENAI_USE_VERTEXAI appears in README but not on the authentication docs page."
+      ],
+      "last_verified": "2026-10-19",
+      "auth_summary": "`GEMINI_API_KEY`, or a Vertex AI service account"
+    },
+    {
+      "id": "goose",
+      "name": "goose",
+      "vendor": "Agentic AI Foundation (Linux Foundation); created by Block",
+      "binary": "goose",
+      "summary": "Open-source, extensible AI agent, now part of the Linux Foundation's Agentic AI Foundation.",
+      "homepage": "https://goose-docs.ai/",
+      "docs": "https://goose-docs.ai/docs/category/getting-started",
+      "repo": "https://github.com/aaif-goose/goose",
+      "license": {
+        "value": "Apache-2.0",
+        "open_source": true,
+        "quote": "Apache License\n                           Version 2.0, January 2004",
+        "source": "https://github.com/aaif-goose/goose/blob/main/LICENSE"
+      },
+      "latest_version_checked": "1.54.0",
+      "install": [
+        {
+          "label": "Install script",
+          "command": "curl -fsSL https://github.com/aaif-goose/goose/releases/download/stable/download_cli.sh | CONFIGURE=false bash",
+          "requirements": null,
+          "quote": "If you'd like to install without interactive configuration, disable `CONFIGURE`:",
+          "source": "https://goose-docs.ai/docs/getting-started/installation"
+        }
+      ],
+      "headless_doc": {
+        "value": "goose run -t \"<task>\"",
+        "detail": "goose run --no-session -t \"<prompt>\"  (or -i <file>, or echo \"...\" | goose run -i -)",
+        "notes": "Starts a session, executes, and exits when the task is complete. -q/--quiet prints only the model response to stdout. Docs recommend checking the exit code in scripts. --max-turns caps autonomy (default 1000).",
+        "quote": "The `goose run` command starts a new session, begins executing using any arguments provided and exits the session automatically once the task is complete.",
+        "source": "https://goose-docs.ai/docs/guides/running-tasks"
+      },
+      "auto_approve": {
+        "value": "`GOOSE_MODE=auto` (the default): acts without asking",
+        "detail": "GOOSE_MODE=auto (also the default). Other modes: approve, smart_approve, chat.",
+        "notes": "Autonomous mode is the default, so goose edits files and runs shell commands without asking unless GOOSE_MODE is changed. The headless tutorial explicitly sets GOOSE_MODE=auto for non-interactive execution.",
+        "quote": "| `GOOSE_MODE` | Controls how goose handles tool execution | \"auto\", \"approve\", \"chat\", \"smart_approve\" | \"auto\" |",
+        "source": "https://goose-docs.ai/docs/guides/environment-variables"
+      },
+      "json_output": {
+        "value": "`--output-format json` or `stream-json`",
+        "detail": "--output-format json (final result) or --output-format stream-json (events)",
+        "quote": "`--output-format <FORMAT>`**: Output format (`text`, `json`, or `stream-json`). Default is `text`.",
+        "source": "https://goose-docs.ai/docs/guides/goose-cli-commands"
+      },
+      "resume": {
+        "value": "`goose run --resume`",
+        "detail": "goose run -r / --resume (with -n <name>); goose session --resume [-n <name> | --session-id <id>]",
+        "quote": "**`-r, --resume`**: Resume from a previous run",
+        "source": "https://goose-docs.ai/docs/guides/goose-cli-commands"
+      },
+      "model_flag": {
+        "value": "`--provider` and `--model` (or `GOOSE_PROVIDER` / `GOOSE_MODEL`)",
+        "detail": "--provider <name> --model <model> on goose run (or env GOOSE_PROVIDER / GOOSE_MODEL)",
+        "quote": "goose run --provider anthropic --model claude-4-sonnet -t \"initial prompt\"",
+        "source": "https://goose-docs.ai/docs/guides/goose-cli-commands"
+      },
+      "providers": {
+        "value": "Anthropic, OpenAI, Gemini, Ollama, OpenRouter, Azure, Bedrock, Groq, GitHub Copilot, custom OpenAI-compatible endpoints and more",
+        "detail": "15+ providers: Anthropic, OpenAI, Google Gemini, Ollama, OpenRouter, Azure, Bedrock, Groq, GitHub Copilot, local LLMs, custom OpenAI-compatible endpoints, plus ACP agent providers",
+        "quote": "goose works with 15+ providers — Anthropic, OpenAI, Google, Ollama, OpenRouter, Azure, Bedrock, and more.",
+        "source": "https://github.com/aaif-goose/goose"
+      },
+      "instructions_file": {
+        "value": "`.goosehints` and `AGENTS.md`",
+        "detail": ".goosehints and AGENTS.md by default (configurable via CONTEXT_FILE_NAMES, e.g. add CLAUDE.md); global hints in ~/.config/goose/.goosehints",
+        "quote": "| `CONTEXT_FILE_NAMES` | Specifies custom filenames for [hint/context files](/docs/guides/context-engineering/using-goosehints#custom-context-files) | JSON array of strings (e.g., `[\"CLAUDE.md\", \".goosehints\"]`) | `[\".goosehints\", \"AGENTS.md\"]` |",
+        "source": "https://goose-docs.ai/docs/guides/environment-variables"
+      },
+      "config_dir": {
+        "value": "`~/.config/goose/config.yaml`; secrets in the keyring or `secrets.yaml`",
+        "detail": "~/.config/goose/config.yaml (provider, model, extensions); secrets in system keyring, or ~/.config/goose/secrets.yaml (plain text) when keyring disabled/unavailable; sessions in SQLite sessions.db",
+        "quote": "Your environment does not provide a desktop keyring service (for example: headless servers, CI/CD, containers)",
+        "source": "https://goose-docs.ai/docs/guides/config-files"
+      },
+      "sandbox": {
+        "value": "None for its own shell commands",
+        "detail": "No built-in sandbox for the agent's own shell commands documented; extensions can be run inside a Docker container with --container <container_id>",
+        "quote": "**`--container <container_id>`**: Run extensions [inside a Docker container](/docs/tutorials/goose-in-docker#running-extensions-in-docker-containers).",
+        "source": "https://goose-docs.ai/docs/guides/goose-cli-commands"
+      },
+      "mcp": {
+        "value": "Yes: extensions are MCP servers",
+        "detail": "Yes: extensions are MCP servers; configure in config.yaml / `goose configure`, or per run with --with-extension, --with-streamable-http-extension, --with-builtin",
+        "quote": "Connect to 70+ extensions via the [Model Context Protocol](https://modelcontextprotocol.io/) open standard.",
+        "source": "https://github.com/aaif-goose/goose"
+      },
+      "pricing_note": {
+        "value": "Free (Apache-2.0); you pay your model provider",
+        "detail": "Free and open source (Apache-2.0); you pay your model provider, or use free tiers / local models, or existing subscriptions via ACP providers.",
+        "quote": "goose is a free and open source AI agent that you can start using right away, but not all supported [LLM Providers][providers] provide a free tier.",
+        "source": "https://goose-docs.ai/docs/getting-started/providers"
+      },
+      "providers_short": "15+ providers, local",
+      "server_mode": {
+        "value": "`goose serve` (ACP over HTTP), `goose acp`",
+        "detail": "goose serve [--host 127.0.0.1] [--port 3284] (ACP over HTTP/WebSocket; requires GOOSE_SERVER__SECRET_KEY unless --dangerously-unauthenticated); goose acp (ACP over stdio)",
+        "quote": "Start goose as an Agent Client Protocol (ACP) server over HTTP and WebSocket.",
+        "source": "https://goose-docs.ai/docs/guides/goose-cli-commands"
+      },
+      "update_env": {
+        "value": "`GOOSE_DISABLE_KEYRING=1`; pin installs with `GOOSE_VERSION`",
+        "detail": "GOOSE_TELEMETRY_ENABLED=false (default false; opt-in asked on first use); GOOSE_DISABLE_KEYRING=1; GOOSE_DISABLE_SESSION_NAMING=true; pin installs with GOOSE_VERSION. No auto-update env var documented (updates are manual via `goose update`).",
+        "quote": "export GOOSE_TELEMETRY_ENABLED=false  # Disable telemetry",
+        "source": "https://goose-docs.ai/docs/guides/environment-variables"
+      },
+      "auth": [
+        {
+          "method": "API key env var (no keyring)",
+          "env": [
+            "GOOSE_PROVIDER",
+            "GOOSE_MODEL",
+            "ANTHROPIC_API_KEY",
+            "OPENAI_API_KEY",
+            "GOOGLE_API_KEY",
+            "OPENROUTER_API_KEY",
+            "GOOSE_DISABLE_KEYRING"
+          ],
+          "how": "Install with CONFIGURE=false, then export GOOSE_PROVIDER, GOOSE_MODEL and the provider key (e.g. ANTHROPIC_API_KEY). Set GOOSE_DISABLE_KEYRING=1 on servers without a keyring service. Provider env vars take precedence over stored secrets. API keys placed in config.yaml are ignored.",
+          "quote": "It can also be supplied through the provider's environment variable (for example `OPENAI_API_KEY`), which takes precedence over stored secrets.",
+          "source": "https://goose-docs.ai/docs/guides/config-files"
+        },
+        {
+          "method": "config file written by script (CI pattern)",
+          "env": [
+            "GOOSE_PROVIDER",
+            "GOOSE_MODEL"
+          ],
+          "how": "Write ~/.config/goose/config.yaml containing GOOSE_PROVIDER, GOOSE_MODEL and `keyring: false`, and supply the API key via env.",
+          "quote": "keyring: false",
+          "source": "https://goose-docs.ai/docs/tutorials/cicd"
+        },
+        {
+          "method": "subscription via ACP providers (Claude Code / ChatGPT Plus/Pro)",
+          "env": [],
+          "how": "Install and authenticate the vendor's agent (e.g. Claude Code with claude-agent-acp) on the server, then select the ACP provider in goose. Session resume/fork not supported for ACP providers.",
+          "quote": "ACP providers let you use goose with your existing Claude Code or ChatGPT Plus/Pro subscriptions — no per-token API costs.",
+          "source": "https://goose-docs.ai/docs/guides/acp-providers"
+        }
+      ],
+      "run": {
+        "version": "goose --version",
+        "headless": "goose run -t \"<task>\"",
+        "unattended": "GOOSE_PROVIDER=anthropic GOOSE_MODEL=claude-sonnet-5-5 \\\n  goose run --no-session -t \"Fix the failing tests\"",
+        "explain": [
+          [
+            "run -t",
+            "Run the text as a task and exit when it's done"
+          ],
+          [
+            "--no-session",
+            "Don't save a session for this one-off run"
+          ],
+          [
+            "GOOSE_PROVIDER / GOOSE_MODEL",
+            "Which provider and model to use, with that provider's key (e.g. `ANTHROPIC_API_KEY`) in the environment"
+          ]
+        ]
+      },
+      "container": {
+        "install": "curl -fsSL https://github.com/aaif-goose/goose/releases/download/stable/download_cli.sh | CONFIGURE=false bash",
+        "run": "goose run --no-session -t \"$prompt\""
+      },
+      "northflank": {
+        "native": false,
+        "harness_type": "none"
+      },
+      "gotchas": [
+        {
+          "text": "Repo moved from block/goose to aaif-goose/goose and docs to goose-docs.ai; github.com/block/goose redirects",
+          "source": "https://github.com/aaif-goose/goose"
+        },
+        {
+          "text": "Default GOOSE_MODE is auto, so goose acts without approval by default; run it in an isolated container/VM",
+          "source": "https://goose-docs.ai/docs/guides/environment-variables"
+        },
+        {
+          "text": "Headless servers/containers have no keyring: secrets fall back to plain-text ~/.config/goose/secrets.yaml; prefer GOOSE_DISABLE_KEYRING=1 plus env vars",
+          "source": "https://goose-docs.ai/docs/guides/config-files"
+        },
+        {
+          "text": "Unattended processes can block indefinitely on keyring access; docs show GOOSE_DISABLE_KEYRING=1 with env credentials",
+          "source": "https://goose-docs.ai/docs/guides/goose-cli-commands"
+        },
+        {
+          "text": "Pin GOOSE_VERSION in CI to avoid 404s when the stable tag lacks CLI assets",
+          "source": "https://goose-docs.ai/docs/tutorials/cicd"
+        },
+        {
+          "text": "goose serve binds 127.0.0.1:3284 by default and requires GOOSE_SERVER__SECRET_KEY",
+          "source": "https://goose-docs.ai/docs/guides/goose-cli-commands"
+        },
+        {
+          "text": "Use --no-session for one-off runs and --max-turns to cap runaway execution",
+          "source": "https://goose-docs.ai/docs/tutorials/headless-goose"
+        },
+        {
+          "text": "Homebrew formula/cask names still use the old 'block-goose' prefix",
+          "source": "https://goose-docs.ai/docs/getting-started/installation"
+        }
+      ],
+      "open_questions": [
+        "Exact exit-code semantics of `goose run` on tool/model failure are not documented beyond 'check exit codes'.",
+        "No documented OS-level sandbox for the developer extension's shell commands.",
+        "Whether `goose run` accepts the prompt as a positional argument (vs -t/-i) is not documented; use -t.",
+        "Whether the CLI auto-updates on its own: not documented; only manual `goose update` is described."
+      ],
+      "last_verified": "2026-10-19",
+      "auth_summary": "`GOOSE_PROVIDER`, `GOOSE_MODEL` and the provider key"
+    },
+    {
+      "id": "qwen-code",
+      "name": "Qwen Code",
+      "vendor": "Alibaba Qwen team",
+      "binary": "qwen",
+      "summary": "Alibaba's open-source terminal agent, forked from Gemini CLI.",
+      "homepage": "https://qwenlm.github.io/qwen-code-docs/en/users/overview",
+      "docs": "https://qwenlm.github.io/qwen-code-docs/en/users/overview",
+      "repo": "https://github.com/QwenLM/qwen-code",
+      "license": {
+        "value": "Apache-2.0",
+        "open_source": true,
+        "quote": "Apache-2.0 license",
+        "source": "https://github.com/QwenLM/qwen-code"
+      },
+      "latest_version_checked": "0.25.2",
+      "install": [
+        {
+          "label": "npm",
+          "command": "npm install -g @qwen-code/qwen-code@latest",
+          "requirements": "Node.js 22+",
+          "quote": "requires Node.js 22+",
+          "source": "https://github.com/QwenLM/qwen-code"
+        },
+        {
+          "label": "Install script",
+          "command": "curl -fsSL https://qwen-code-assets.oss-cn-hangzhou.aliyuncs.com/installation/install-qwen-standalone.sh | bash",
+          "requirements": null,
+          "quote": "Restart your terminal after installation to ensure environment variables take effect.",
+          "source": "https://github.com/QwenLM/qwen-code"
+        }
+      ],
+      "headless_doc": {
+        "value": "qwen -p \"<task>\"",
+        "detail": "qwen -p \"<prompt>\" (or --prompt; or pipe stdin: echo \"...\" | qwen)",
+        "notes": "Documented exit codes: 53 turn-cap exceeded, 55 run-level budget abort, 130 SIGINT; full table not documented.",
+        "quote": "Use the `--prompt` (or `-p`) flag to run in headless mode:",
+        "source": "https://qwenlm.github.io/qwen-code-docs/en/users/features/headless/"
+      },
+      "auto_approve": {
+        "value": "`--approval-mode yolo` (or `-y`); safer: `auto-edit`",
+        "detail": "--yolo / -y or --approval-mode yolo (auto-approve all). Intermediate: --approval-mode auto-edit, --approval-mode auto, --approval-mode plan (analyze only), default. Settings default tools.approvalMode is auto.",
+        "notes": "Use with sandbox (-s / QWEN_SANDBOX) for isolation.",
+        "quote": "Set approval mode (`plan`, `default`, `auto-edit`, `auto`, `yolo`)",
+        "source": "https://qwenlm.github.io/qwen-code-docs/en/users/features/headless/"
+      },
+      "json_output": {
+        "value": "`--output-format json` or `stream-json`",
+        "detail": "--output-format json (JSON array) or --output-format stream-json",
+        "quote": "Returns structured data as a JSON array.",
+        "source": "https://qwenlm.github.io/qwen-code-docs/en/users/features/headless/"
+      },
+      "resume": {
+        "value": "`--continue` / `--resume <id>`",
+        "detail": "--continue (most recent session for this project) or --resume [sessionId]",
+        "quote": "Resume the most recent session for this project",
+        "source": "https://qwenlm.github.io/qwen-code-docs/en/users/features/headless/"
+      },
+      "model_flag": {
+        "value": "`-m, --model` (or `OPENAI_MODEL`)",
+        "detail": "--model / -m <model>; env OPENAI_MODEL (alias QWEN_MODEL)",
+        "quote": "Model to use for this run",
+        "source": "https://qwenlm.github.io/qwen-code-docs/en/users/features/headless/"
+      },
+      "providers": {
+        "value": "Any OpenAI-compatible API, Anthropic, Gemini, Qwen/DashScope, OpenRouter, and local models (Ollama, vLLM)",
+        "detail": "Bring-your-own provider: OpenAI-compatible, Anthropic, Gemini, and Qwen/DashScope APIs, OpenRouter, plus local models (Ollama, vLLM).",
+        "quote": "Supports OpenAI, Anthropic, Gemini, and Qwen APIs.",
+        "source": "https://github.com/QwenLM/qwen-code"
+      },
+      "instructions_file": {
+        "value": "`QWEN.md` (configurable via `context.fileName`)",
+        "detail": "QWEN.md (~/.qwen/QWEN.md, project-root QWEN.md, .qwen/QWEN.local.md); memory docs say AGENTS.md is also read; configurable via context.fileName.",
+        "quote": "If your repository already has an `AGENTS.md` file for other AI tools, Qwen reads that too.",
+        "source": "https://qwenlm.github.io/qwen-code-docs/en/users/features/memory/"
+      },
+      "config_dir": {
+        "value": "`~/.qwen/settings.json`",
+        "detail": "~/.qwen/ (settings.json, QWEN.md; override with QWEN_HOME); project .qwen/settings.json. Credential storage location for API keys: env, .env, or settings.json env block.",
+        "quote": "Customizes the global configuration directory (default: `~/.qwen`).",
+        "source": "https://qwenlm.github.io/qwen-code-docs/en/users/configuration/settings/"
+      },
+      "sandbox": {
+        "value": "Optional: Docker, Podman or Seatbelt; bubblewrap for tool execution",
+        "detail": "Optional whole-CLI sandbox: macOS Seatbelt (sandbox-exec) or Docker/Podman; enable with -s/--sandbox, QWEN_SANDBOX=true|docker|podman|sandbox-exec, or tools.sandbox. Separate Linux tool execution sandbox (tools.executionSandbox) using bubblewrap with Landlock fallback.",
+        "quote": "Cross-platform sandboxing with complete process isolation.",
+        "source": "https://qwenlm.github.io/qwen-code-docs/en/users/features/sandbox/"
+      },
+      "mcp": {
+        "value": "Yes: `qwen mcp add`",
+        "detail": "Yes. qwen mcp add [options] <name> <commandOrUrl> [args...] (e.g. --transport http); writes mcpServers to ~/.qwen/settings.json (user scope default) or .qwen/settings.json.",
+        "quote": "qwen mcp add --transport http my-server http://localhost:3000/mcp",
+        "source": "https://qwenlm.github.io/qwen-code-docs/en/users/features/mcp/"
+      },
+      "pricing_note": {
+        "value": "Pay your provider's API rates, or Alibaba Cloud Coding Plan. The free Qwen OAuth tier ended on 2026-04-15",
+        "detail": "No free tier anymore (Qwen OAuth free tier ended 2026-04-15). Pay your chosen provider's API rates, or use Alibaba Cloud Coding Plan (fixed monthly subscription).",
+        "quote": "The Qwen OAuth free tier was discontinued on 2026-04-15.",
+        "source": "https://qwenlm.github.io/qwen-code-docs/en/users/configuration/auth/"
+      },
+      "providers_short": "OpenAI-compatible, Anthropic, Gemini, local",
+      "update_env": {
+        "value": "`general.enableAutoUpdate: false` in `settings.json`",
+        "detail": "Settings: general.enableAutoUpdate=false, privacy.usageStatisticsEnabled=false in ~/.qwen/settings.json. OTel telemetry is opt-in (QWEN_TELEMETRY_ENABLED).",
+        "quote": "Enable automatic update checks and installations on startup.",
+        "source": "https://qwenlm.github.io/qwen-code-docs/en/users/configuration/settings/"
+      },
+      "auth": [
+        {
+          "method": "OpenAI-compatible API key (any provider or self-hosted endpoint)",
+          "env": [
+            "OPENAI_API_KEY",
+            "OPENAI_BASE_URL",
+            "OPENAI_MODEL"
+          ],
+          "how": "export OPENAI_API_KEY, OPENAI_BASE_URL, OPENAI_MODEL (or set in .env / settings.json env). Precedence: shell export > .env > settings.json env.",
+          "quote": "`OPENAI_API_KEY`, `OPENAI_BASE_URL`, `OPENAI_MODEL` (alias: `QWEN_MODEL`)",
+          "source": "https://qwenlm.github.io/qwen-code-docs/en/users/configuration/auth/"
+        },
+        {
+          "method": "Alibaba Cloud Coding Plan (subscription)",
+          "env": [
+            "OPENAI_API_KEY",
+            "OPENAI_BASE_URL"
+          ],
+          "how": "Use the sk-sp-... Coding Plan key with endpoint https://coding-intl.dashscope.aliyuncs.com/v1 (international) or https://coding.dashscope.aliyuncs.com/v1 (China), via env vars or settings.json modelProviders.",
+          "quote": "Use Coding Plan or API key authentication there instead",
+          "source": "https://qwenlm.github.io/qwen-code-docs/en/users/configuration/auth/"
+        },
+        {
+          "method": "Provider-specific keys (DashScope, Anthropic, Gemini)",
+          "env": [
+            "DASHSCOPE_API_KEY",
+            "ANTHROPIC_API_KEY",
+            "GEMINI_API_KEY"
+          ],
+          "how": "Set the key and select protocol via security.auth.selectedType (openai|anthropic|gemini) and modelProviders in ~/.qwen/settings.json.",
+          "quote": "Tells Qwen Code which protocol to use on startup (e.g. `openai`, `anthropic`, `gemini`).",
+          "source": "https://qwenlm.github.io/qwen-code-docs/en/users/configuration/auth/"
+        }
+      ],
+      "run": {
+        "version": "qwen --version",
+        "headless": "qwen -p \"<task>\"",
+        "unattended": "qwen -p \"Fix the failing tests\" --approval-mode yolo",
+        "explain": [
+          [
+            "-p",
+            "Headless mode: run the prompt and exit"
+          ],
+          [
+            "--approval-mode yolo",
+            "Approve every action. Use `auto-edit` to approve only file edits"
+          ]
+        ]
+      },
+      "container": {
+        "install": "ensure_node && npm install -g --prefix \"$HOME/.npm-global\" @qwen-code/qwen-code",
+        "run": "qwen -p \"$prompt\" --approval-mode \"${QWEN_APPROVAL_MODE:-yolo}\""
+      },
+      "northflank": {
+        "native": false,
+        "harness_type": "none"
+      },
+      "gotchas": [
+        {
+          "text": "Qwen OAuth free tier was discontinued on 2026-04-15; use an API key or Coding Plan on servers",
+          "source": "https://qwenlm.github.io/qwen-code-docs/en/users/configuration/auth/"
+        },
+        {
+          "text": "In CI, SSH, or containers you typically cannot complete the OAuth browser login",
+          "source": "https://qwenlm.github.io/qwen-code-docs/en/users/configuration/auth/"
+        },
+        {
+          "text": "npm install requires Node.js 22+",
+          "source": "https://github.com/QwenLM/qwen-code"
+        },
+        {
+          "text": "Env precedence: shell export > .env > settings.json env",
+          "source": "https://qwenlm.github.io/qwen-code-docs/en/users/configuration/auth/"
+        },
+        {
+          "text": "general.enableAutoUpdate defaults to true and installs updates on startup; disable in images",
+          "source": "https://qwenlm.github.io/qwen-code-docs/en/users/configuration/settings/"
+        },
+        {
+          "text": "Docker sandbox mounts workspace and ~/.qwen and pulls a published sandbox image on demand",
+          "source": "https://qwenlm.github.io/qwen-code-docs/en/users/features/sandbox/"
+        },
+        {
+          "text": "Linux execution sandbox expects bwrap at /usr/bin/bwrap",
+          "source": "https://qwenlm.github.io/qwen-code-docs/en/users/features/sandbox/"
+        },
+        {
+          "text": "Forked from Google Gemini CLI v0.8.2, developed independently since v0.1, so flags resemble Gemini CLI but differ",
+          "source": "https://github.com/QwenLM/qwen-code"
+        }
+      ],
+      "open_questions": [
+        "AGENTS.md: memory docs say it is read, but settings reference only names QWEN.md as default and GitHub issue #2006 requests AGENTS.md default support; verify in a live session or set context.fileName explicitly.",
+        "Coding Plan price/quota not verified from an official Alibaba page in this pass (search summary suggested $50/month Pro tier).",
+        "npm registry 'latest' document did not show a license field; Apache-2.0 taken from GitHub repo.",
+        "Whether the sandbox is on by default is not explicitly stated.",
+        "Full headless exit-code table not documented."
+      ],
+      "last_verified": "2026-10-19",
+      "auth_summary": "`OPENAI_API_KEY` and `OPENAI_BASE_URL` (any compatible API)"
+    }
+  ]
+}

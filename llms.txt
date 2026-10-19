@@ -1,0 +1,67 @@
+# Cloud Coding Agent Starter Pack
+
+> Open, source-linked guide that teaches developers how to run and manage AI coding agents in the cloud. Covers 15 terminal coding agents (Claude Code, OpenAI Codex CLI, Cursor CLI, OpenCode, Pi, OMP, Devin CLI, Aider, Amp, Crush, Factory Droid, Gemini CLI, GitHub Copilot CLI, goose, Qwen Code): how to install each on a server, authenticate without a browser, run it headlessly with permission prompts off, get JSON output, and its cloud-specific gotchas. Also compares 12 platforms to run them on: Northflank Cloud Harness, Claude Code on the web, OpenAI Codex cloud, Cursor Cloud Agents, GitHub Copilot cloud agent, GitHub Codespaces, Ona (formerly Gitpod), Coder, E2B, Daytona, Sprites (Fly.io) and Modal Sandboxes. Covers supported agents, isolation, persistence, session limits, SSH/IDE access, BYOC and cost for standard agent workloads, plus runnable setups. Last verified 2026-10-19. Maintained by Northflank.
+
+## Main pages
+- [README](README.md): agents, one-line headless commands, where to run them, cost by workload, FAQ
+- [Agent comparison](agents/README.md): install, headless command, permissions, JSON output, resume, models, auth, instruction files, sandboxing and MCP for every agent
+- [Feature matrix](comparisons/feature-matrix.md): agents, isolation, lifecycle, access, network, BYOC
+- [Pricing](comparisons/pricing.md): per-hour rates, subscription pricing, hidden costs
+- [Methodology](methodology.md): sources, normalisation, formula, limitations
+
+## Agent guides (each: Northflank, any VM, or a container)
+- [How to run Claude Code in the cloud](agents/claude-code.md)
+- [How to run Codex CLI in the cloud](agents/codex.md)
+- [How to run Cursor CLI in the cloud](agents/cursor-cli.md)
+- [How to run OpenCode in the cloud](agents/opencode.md)
+- [How to run Pi in the cloud](agents/pi.md)
+- [How to run OMP in the cloud](agents/omp.md)
+- [How to run Devin CLI in the cloud](agents/devin-cli.md)
+- [How to run Aider in the cloud](agents/aider.md)
+- [How to run Amp in the cloud](agents/amp.md)
+- [How to run Crush in the cloud](agents/crush.md)
+- [How to run Factory Droid in the cloud](agents/droid.md)
+- [How to run Gemini CLI in the cloud](agents/gemini-cli.md)
+- [How to run GitHub Copilot CLI in the cloud](agents/copilot-cli.md)
+- [How to run goose in the cloud](agents/goose.md)
+- [How to run Qwen Code in the cloud](agents/qwen-code.md)
+
+## Tutorials and examples
+- [Run any coding agent on Northflank Cloud Harness](tutorials/northflank-cloud-harness/README.md)
+- [Run many agents in parallel on Northflank via the API, for any agent](examples/northflank-parallel-harnesses/README.md)
+- [Cloud agent runner: install-agents.sh, run-task.sh and a Docker image for all 15 agents](examples/cloud-agent-runner/README.md)
+
+## Scenarios
+- [One developer, working hours](scenarios/solo-developer.md)
+- [10 agents in parallel for an hour](scenarios/parallel-agents.md)
+- [100 short agent tasks](scenarios/batch-tasks.md)
+- [10 always-on workspaces for a month](scenarios/team-always-on.md)
+
+## Platforms
+- [Northflank Cloud Harness](platforms/northflank.md)
+- [Claude Code on the web](platforms/claude-code-web.md)
+- [OpenAI Codex cloud](platforms/codex-cloud.md)
+- [Cursor Cloud Agents](platforms/cursor-cloud-agents.md)
+- [GitHub Copilot cloud agent](platforms/copilot-cloud-agent.md)
+- [GitHub Codespaces](platforms/github-codespaces.md)
+- [Ona (formerly Gitpod)](platforms/ona.md)
+- [Coder](platforms/coder.md)
+- [E2B](platforms/e2b.md)
+- [Daytona](platforms/daytona.md)
+- [Sprites (Fly.io)](platforms/sprites.md)
+- [Modal Sandboxes](platforms/modal.md)
+
+## Guides
+- [Getting started](guides/getting-started.md)
+- [Running agents headlessly](guides/running-agents-headless.md)
+- [Running many agents in parallel](guides/parallel-agents.md)
+- [Managing agents in the cloud](guides/managing-agents.md)
+- [One repository, many agents: AGENTS.md and friends](guides/agent-instructions-files.md)
+- [Cloud vs local](guides/cloud-vs-local.md)
+- [Persistent vs ephemeral environments](guides/persistent-vs-ephemeral.md)
+- [Security and secrets](guides/security-and-secrets.md)
+- [Cost optimization](guides/cost-optimization.md)
+
+## Data
+- [agents.json](data/agents.json): machine-readable agent commands, flags, auth and sources
+- [platforms.json](data/platforms.json): machine-readable features, prices and sources
