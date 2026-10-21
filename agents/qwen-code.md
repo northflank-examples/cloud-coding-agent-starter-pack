@@ -112,14 +112,7 @@ docker run --rm --env-file .env cloud-agent run-task.sh qwen-code "Fix the faili
 - Docker sandbox mounts workspace and ~/.qwen and pulls a published sandbox image on demand. ([source](https://qwenlm.github.io/qwen-code-docs/en/users/features/sandbox/))
 - Linux execution sandbox expects bwrap at /usr/bin/bwrap. ([source](https://qwenlm.github.io/qwen-code-docs/en/users/features/sandbox/))
 - Forked from Google Gemini CLI v0.8.2, developed independently since v0.1, so flags resemble Gemini CLI but differ. ([source](https://github.com/QwenLM/qwen-code))
-
-## Not documented / open questions
-
-- AGENTS.md: memory docs say it is read, but settings reference only names QWEN.md as default and GitHub issue #2006 requests AGENTS.md default support; verify in a live session or set context.fileName explicitly.
-- Coding Plan price/quota not verified from an official Alibaba page in this pass (search summary suggested $50/month Pro tier).
-- npm registry 'latest' document did not show a license field; Apache-2.0 taken from GitHub repo.
-- Whether the sandbox is on by default is not explicitly stated.
-- Full headless exit-code table not documented.
+- To make sure Qwen Code reads `AGENTS.md`, add it to `context.fileName` in `.qwen/settings.json`. ([source](https://qwenlm.github.io/qwen-code-docs/en/users/features/memory/))
 
 ## Sources
 

@@ -51,7 +51,7 @@ Last verified: **2026-10-19** · Official pricing: <https://docs.github.com/en/b
 | [100 tasks × 30 min](../scenarios/batch-tasks.md) | $9.00 | $0.00 | $9.00 |
 | [10 × 24/7 (month)](../scenarios/team-always-on.md) | $1,314.00 | $14.00 | $1,328.00 |
 
-## Caveats and open questions
+## Caveats
 
 - RAM per machine type isn't listed on GitHub's billing or docs pages, so the comparison assumes the 2-core machine fits a 2 vCPU / 4 GiB workload.
 - The 12-hour maximum lifetime means always-on agents must be restarted at least twice a day.

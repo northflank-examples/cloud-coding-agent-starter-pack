@@ -17,14 +17,14 @@ How values in this repository are collected, normalised and calculated, so you c
 ## How agent data is collected
 
 - Each agent's entry in [`data/agents.json`](data/agents.json) comes from the vendor's own documentation, its official repository, or its official package registry entry (npm, PyPI). Every fact keeps a verbatim `quote` and its `source` URL, and the guides link them.
-- Flags are taken from the vendor's current CLI reference on the `last_verified` date. Where two official pages disagree (for example, Cursor's docs on whether print mode applies edits without `--force`), both are noted under the agent's open questions, and the recommended command uses the setting that works either way.
+- Flags are taken from the vendor's current CLI reference on the `last_verified` date. Where two official pages disagree (for example, Cursor's docs on whether print mode applies edits without `--force`), the recommended command uses the setting that works either way, and the guide says so under Gotchas.
 - The recommended unattended command for each agent (`run.unattended`) and the commands in [`run-task.sh`](examples/cloud-agent-runner/run-task.sh) and [`install-agents.sh`](examples/cloud-agent-runner/install-agents.sh) are generated from the same entry, so the guides and the scripts can't disagree.
 - Agent CLIs change quickly. The commands are checked against the documentation, but they haven't all been run end to end against every agent's live service; issues and pull requests reporting a changed flag are the fastest way to fix one.
 
 ## Missing and uncertain data
 
 - `null` / **not published** means the vendor doesn't publish the value, or it couldn't be verified. It never means free, unlimited or unsupported.
-- Ambiguities and conflicts between sources are listed under each platform's **Caveats and open questions** and each agent's **Not documented / open questions**.
+- Assumptions that affect a platform's numbers are listed under its **Caveats**. Where an agent's docs are ambiguous or contradict each other, the guide's recommended command uses the setting that works either way, and the practical consequence appears under **Gotchas**.
 
 ## Normalisation
 
@@ -78,7 +78,7 @@ The implementation is [`scripts/model.py`](scripts/model.py), with no dependenci
 
 This repository is maintained by Northflank, one of the platforms compared. To keep that from biasing the comparison:
 
-- Northflank is held to the same sourcing rules as every other platform. Its open questions are published like everyone else's.
+- Northflank is held to the same sourcing rules as every other platform.
 - All calculations are open source and reproducible.
 - Cases where other platforms are stronger, such as Sprites' auto-pause or Copilot's and Claude Code's built-in network firewalls, are reported as prominently as Northflank's strengths.
 - Any vendor can submit corrections (see [CONTRIBUTING.md](CONTRIBUTING.md)).

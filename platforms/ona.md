@@ -41,7 +41,7 @@ Last verified: **2026-10-19** · Official pricing: <https://ona.com/pricing>
 - "New customer signup is closed. Existing customers and new members joining existing organizations can continue using Ona."
 - "In Enterprise, usage is billed in credits rather than OCUs."
 
-## Caveats and open questions
+## Caveats
 
 - The site header says 'Part of OpenAI'. The terms and timing aren't documented on the pages checked.
 - The dollar price per OCU is not published.

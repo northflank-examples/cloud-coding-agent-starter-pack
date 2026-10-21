@@ -112,13 +112,6 @@ docker run --rm --env-file .env cloud-agent run-task.sh copilot-cli "Fix the fai
 - COPILOT_GITHUB_TOKEN and GITHUB_TOKEN values are redacted from output by default. Use --secret-env-vars to redact other variables from shell and MCP environments. ([source](https://docs.github.com/en/copilot/reference/cli-command-reference))
 - Org or enterprise admins can disable the CLI by policy. ([source](https://github.com/github/copilot-cli))
 
-## Not documented / open questions
-
-- The README's billing text ('monthly quota of premium requests is reduced by one') conflicts with the docs, which say AI credits are charged by token. The docs look newer.
-- Neither the npm metadata nor the README gives a minimum Node.js version for the npm install.
-- The CLI reference documents no specific process exit codes.
-- No env var or flag to opt out of telemetry is documented. Only OpenTelemetry export is.
-
 ## Sources
 
 - <https://docs.github.com/copilot/concepts/agents/about-copilot-cli>

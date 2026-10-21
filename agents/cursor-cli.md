@@ -106,14 +106,7 @@ docker run --rm --env-file .env cloud-agent run-task.sh cursor-cli "Fix the fail
 - With --output-format json, a failed run exits non-zero and emits no JSON object, only stderr. ([source](https://cursor.com/docs/cli/reference/output-format))
 - Agent commits and PRs get a 'Made with Cursor' trailer/footer by default (attribution.* in cli-config.json). ([source](https://cursor.com/docs/cli/reference/configuration))
 - The binary is `agent`; the install script also creates a legacy `cursor-agent` symlink, both in `~/.local/bin` (checked in the script on 2026-10-16). ([source](https://cursor.com/install))
-
-## Not documented / open questions
-
-- The CLI docs don't say which Cursor plan the CLI or a user API key needs, or how CLI usage is billed.
-- The docs contradict each other on print mode without --force. headless.md says changes are 'only proposed, not applied'. using.md says 'Cursor has full write access in non-interactive mode'.
-- No documented env var or flag to disable auto-update or telemetry.
-- Where credentials from `agent login` are stored on disk is not documented.
-- No official license statement found.
+- Always pass `--force` in headless runs: Cursor's docs disagree on whether print mode applies edits without it. ([source](https://cursor.com/docs/cli/headless))
 
 ## Sources
 

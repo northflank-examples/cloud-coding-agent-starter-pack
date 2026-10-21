@@ -28,7 +28,7 @@ Run `python3 scripts/generate.py`: the agent then appears in the README, the com
    - update the feature `value` (short, for tables) and optional `detail`, with its `source` URL and, ideally, a verbatim `quote`
    - for prices, update the rate and its `raw_quotes` (verbatim text from the official page)
    - set `last_verified` to today's date (YYYY-MM-DD)
-   - add or adjust `open_questions` if anything is ambiguous
+   - add or adjust `open_questions` (shown on the page as Caveats) for assumptions that affect the numbers
 2. Regenerate every table: `python3 scripts/generate.py`
 3. Check: `python3 scripts/validate.py`
 4. Open a pull request with a link to the **official** page and the date you checked it.

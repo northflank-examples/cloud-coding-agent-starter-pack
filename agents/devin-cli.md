@@ -110,16 +110,7 @@ docker run --rm --env-file .env cloud-agent run-task.sh devin-cli "Fix the faili
 - Devin CLI does not yet support Knowledge, Playbooks or Secrets from your Devin account; pass secrets via the server environment. ([source](https://docs.devin.ai/cli))
 - On legacy Windsurf Enterprise, `devin auth login` can succeed while requests fail with 'CLI access is disabled for this user' if the admin has not enabled CLI access. ([source](https://docs.devin.ai/cli/enterprise/windsurf-auth))
 - DEVIN_SESSIONS_DIR can move the session history database, e.g. off an NFS home directory. ([source](https://docs.devin.ai/cli/changelog/stable))
-
-## Not documented / open questions
-
-- No documented env var (e.g. DEVIN_API_KEY) for authenticating plain `devin`/`devin -p`; WINDSURF_API_KEY is documented only for `devin acp`. The API auth docs list the Devin CLI under 'Best for' for Personal Access Tokens, but don't say how to pass a PAT to the CLI. Can a PAT be pasted in --force-manual-token-flow or set via env? (https://docs.devin.ai/api-reference/authentication)
-- The Free plan lists 'Limited Devin usage' but does not say whether Devin CLI is included.
-- No explicit license text found; closed-source status is inferred from binary-only distribution.
-- No documented way to disable product telemetry.
-- No structured JSON/stream-JSON stdout for -p; the ATIF export format is not spelled out on the commands page.
-- Whether `devin setup` at the end of install.sh blocks or skips cleanly when no TTY is attached is not documented.
-- cli.devin.ai/docs (older 'Devin for Terminal' page) reportedly says private preview for Enterprise customers; current docs.devin.ai self-serve docs include the CLI in Pro/Max/Teams. Treat docs.devin.ai as current.
+- There's no JSON output for `devin -p`; use `--export <path>` to save the conversation to a file. ([source](https://docs.devin.ai/cli/reference/commands))
 
 ## Sources
 

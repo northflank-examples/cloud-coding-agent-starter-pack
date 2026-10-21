@@ -298,8 +298,6 @@ def block_agent(a: dict) -> str:
         L += [f"- {g['text'].rstrip('.')}." + (f" ([source]({g['source']}))" if g.get("source") else "")
               for g in a["gotchas"]]
 
-    if a.get("open_questions"):
-        L += ["", "## Not documented / open questions", ""] + [f"- {q}" for q in a["open_questions"]]
 
     sources = set()
     for v in a.values():

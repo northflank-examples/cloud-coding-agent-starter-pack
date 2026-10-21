@@ -250,7 +250,7 @@ def block_platform(p: dict) -> str:
         ]))
 
     if p.get("open_questions"):
-        lines += ["", "## Caveats and open questions", ""] + [f"- {q}" for q in p["open_questions"]]
+        lines += ["", "## Caveats", ""] + [f"- {q}" for q in p["open_questions"]]
 
     sources = sorted({f["source"] for f in p["features"].values() if f.get("source")} | set(pr.get("sources") or []))
     lines += ["", "## Sources", ""] + [f"- <{s}>" for s in sources]

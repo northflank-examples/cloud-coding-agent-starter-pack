@@ -50,7 +50,7 @@ Last verified: **2026-10-19** · Official pricing: <https://fly.io/sprites>
 | [100 tasks × 30 min](../scenarios/batch-tasks.md) | $5.34 | $0.00 | $5.34 |
 | [10 × 24/7 (month)](../scenarios/team-always-on.md) | $694.96 | $103.66 | $798.62 |
 
-## Caveats and open questions
+## Caveats
 
 - Billing is on measured usage. This comparison assumes the full stated memory is used, with CPU at each scenario's utilisation, which can overstate Sprites' cost for light workloads.
 - Auto-pause after ~30 s idle can make real bills much lower than the running-hours assumptions here.

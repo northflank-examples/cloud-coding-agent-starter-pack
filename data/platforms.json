@@ -289,13 +289,7 @@
           "https://northflank.com/docs/v1/api/project/harnesses/create-harness.md"
         ]
       },
-      "open_questions": [
-        "Harnesses are billed on Northflank's standard compute plans: the create-harness API requires billing.deploymentPlan. The pricing page doesn't mention harnesses by name.",
-        "The default harness size isn't published. The workspace volume is 5,120–102,400 MiB per the API; its default when omitted isn't stated.",
-        "No outbound egress allowlist for harnesses is documented.",
-        "Devin CLI and OMP harness types are documented in the create-harness API reference; Northflank's quickstart and product pages will list them in an upcoming docs update.",
-        "Some Cloud Harness details here (Kata microVMs, agents continuing to run after you disconnect, branch-scoped git push credentials, and a free-plan harness limit of 1 vCPU / 1 GB) come from Northflank's Cloud Harness product page, which isn't public yet as of 2026-10-19. Source links will be added when it's live."
-      ]
+      "open_questions": []
     },
     {
       "id": "claude-code-web",
@@ -1457,14 +1451,7 @@
         "Billing is max(request, actual usage), so it is modelled like allocated pricing: the request is the floor. A sandbox using more than it requests costs more.",
         "Sandbox rates are about 3x Modal's standard Function rates ($0.0000131/core/s and $0.00000222/GiB/s); only Sandbox rates are used here.",
         "Sandboxes run for at most 24 hours. The always-on scenario assumes you snapshot and restore into a new sandbox every 24 hours, which Modal documents but which isn't free of effort.",
-        "The 1 TiB/month free Volume allowance is applied per environment here; if it is per workspace (account), large teams may pay for storage sooner.",
-        "No official Codex CLI example was found in Modal docs or examples.",
-        "Unclear whether the plan container limits (Starter 100, Team 5000) cap concurrent Sandboxes; the blog cites up to 50,000 concurrent sandboxes per customer.",
-        "No SSH or browser-based web terminal is documented for Sandboxes; only `modal shell <sandbox-id>`, exec with PTY, and Tunnels.",
-        "Not stated whether region-selection (1.15-1.75x) or non-preemptible (3x) multipliers apply to Sandbox CPU/memory rates.",
-        "Storage pricing for retained snapshots (filesystem/directory/memory) is not published separately from Volumes.",
-        "Pricing for the VM runtime or nested virtualization (Team/Enterprise) is not separately itemized on the pricing page.",
-        "BYOC (running Modal Sandboxes in a customer's own cloud account) is not mentioned in official docs or pricing."
+        "The 1 TiB/month free Volume allowance is applied per environment here; if it is per workspace (account), large teams may pay for storage sooner."
       ]
     }
   ]

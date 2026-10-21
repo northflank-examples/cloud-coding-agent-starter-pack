@@ -41,7 +41,7 @@ Last verified: **2026-10-19** · Official pricing: <https://learn.chatgpt.com/do
 - "Cloud tasks may use more of your allowance than local messages."
 - "[API Key] No cloud-based features (GitHub code review, Slack, etc.)"
 
-## Caveats and open questions
+## Caveats
 
 - Max task duration, idle behaviour, concurrency limits and isolation technology are not published.
 - Larger or custom VMs on Enterprise are priced separately through OpenAI sales.

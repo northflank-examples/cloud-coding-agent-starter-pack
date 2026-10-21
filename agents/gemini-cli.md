@@ -109,14 +109,6 @@ docker run --rm --env-file .env cloud-agent run-task.sh gemini-cli "Fix the fail
 - Headless exit code 53 means turn limit exceeded, 42 input error. ([source](https://geminicli.com/docs/cli/headless/))
 - general.enableAutoUpdate defaults to true; disable in images. ([source](https://geminicli.com/docs/reference/configuration/))
 
-## Not documented / open questions
-
-- Google blog says Gemini CLI remains accessible via PAID Gemini API keys; the quota page still lists a free (unpaid) API-key tier of 250/day. Whether free AI Studio API keys still work after June 18, 2026 is unclear.
-- Quota page still lists Code Assist Individual / AI Pro / Ultra quotas despite the blog saying those stop being served — page appears stale.
-- Long-term maintenance status of the open-source Gemini CLI is not stated; Antigravity CLI command name/install not captured (antigravity.google/docs/gcli-migration).
-- NO_BROWSER env var and cached OAuth credential path not confirmed in fetched docs.
-- GOOGLE_GENAI_USE_VERTEXAI appears in README but not on the authentication docs page.
-
 ## Sources
 
 - <https://developers.googleblog.com/an-important-update-transitioning-gemini-cli-to-antigravity-cli>

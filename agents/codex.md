@@ -113,15 +113,8 @@ docker run --rm --env-file .env cloud-agent run-task.sh codex "Fix the failing t
 - Sandbox network access is off by default; commands needing network (npm install, pip) need it enabled or full access. ([source](https://learn.chatgpt.com/docs/agent-approvals-security))
 - ~/.codex/auth.json is plaintext and contains access tokens; treat like a password. ([source](https://learn.chatgpt.com/docs/auth))
 - Do not set OPENAI_API_KEY or CODEX_API_KEY as job-level env vars in workflows running repository-controlled code. ([source](https://learn.chatgpt.com/docs/non-interactive-mode))
-
-## Not documented / open questions
-
-- developers.openai.com/codex/* now 308-redirects to learn.chatgpt.com/docs/*; both are OpenAI-official but URLs may change again.
-- Default approval policy for codex exec (e.g. whether it is 'never') is not stated on the non-interactive page.
-- No documented env vars for disabling telemetry/update checks; only config.toml keys found.
-- Exact per-plan usage limits not captured.
-- GitHub latest release tag not confirmed (README release section empty in fetch); npm shows 0.163.0.
-- OPENAI_API_KEY is not documented as being read directly by codex exec; documented path is CODEX_API_KEY or codex login --with-api-key.
+- Authenticate `codex exec` with `CODEX_API_KEY` (or `codex login --with-api-key`); reading `OPENAI_API_KEY` directly isn't documented. ([source](https://learn.chatgpt.com/docs/non-interactive-mode))
+- To stop update checks in images, set `check_for_update_on_startup = false` in `~/.codex/config.toml`; there's no environment variable for it. ([source](https://learn.chatgpt.com/docs/config-file/config-reference))
 
 ## Sources
 

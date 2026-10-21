@@ -113,14 +113,7 @@ docker run --rm --env-file .env cloud-agent run-task.sh crush "Fix the failing t
 - Pseudonymous usage metrics are on by default; disable with CRUSH_DISABLE_METRICS=1 or DO_NOT_TRACK=1. ([source](https://github.com/charmbracelet/crush))
 - Provider list auto-updates from Catwalk; disable with CRUSH_DISABLE_PROVIDER_AUTO_UPDATE=1 for offline/air-gapped containers. ([source](https://github.com/charmbracelet/crush))
 - With a shared `crush serve` backend, --yolo is first-wins per workspace. ([source](https://github.com/charmbracelet/crush))
-
-## Not documented / open questions
-
-- `crush run` flags and its auto-approval behaviour are only documented in source/--help, not the README; re-verify with `crush run --help` on the pinned version.
-- No JSON / machine-readable output flag found for `crush run`.
-- Whether `crush login` (hyper/copilot/openai/grok) works without a browser on a headless server is not documented.
-- Exact file where API keys entered via the TUI/`crush login` are stored (likely the global data config ~/.local/share/crush/crush.json) is not explicitly documented.
-- README calls it `crush serve` in one place while the command defined in source is `crush server`.
+- `crush run` options are documented in `crush run --help` rather than the README, so check it on the version you install. ([source](https://github.com/charmbracelet/crush/blob/main/internal/cmd/run.go))
 
 ## Sources
 

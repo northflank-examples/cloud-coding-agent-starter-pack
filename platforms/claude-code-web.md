@@ -46,7 +46,7 @@ Last verified: **2026-10-19** · Official pricing: <https://claude.com/pricing>
 - "It counts toward your plan's usage limits alongside the rest of your Claude and Claude Code usage, and there's no separate charge for the cloud VM."
 - "$17 Per month with annual subscription discount ( $200 billed up front). $20 if billed monthly."
 
-## Caveats and open questions
+## Caveats
 
 - No documented way to run another agent (such as Codex) in a cloud session.
 - Organisations with ZDR, HIPAA or CMEK can't use cloud sessions.

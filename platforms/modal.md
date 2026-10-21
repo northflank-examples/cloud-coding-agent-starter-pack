@@ -68,20 +68,13 @@ Last verified: **2026-10-19** · Official pricing: <https://modal.com/pricing>
 | [100 tasks × 30 min](../scenarios/batch-tasks.md) | $11.90 | $0.00 | $11.90 |
 | [10 × 24/7 (month)](../scenarios/team-always-on.md) | $1,737.11 | $0.00 | $1,737.11 |
 
-## Caveats and open questions
+## Caveats
 
 - Modal prices CPU per physical core; 1 core = 2 vCPU per Modal's docs, so the per-vCPU rate here is the per-core rate halved.
 - Billing is max(request, actual usage), so it is modelled like allocated pricing: the request is the floor. A sandbox using more than it requests costs more.
 - Sandbox rates are about 3x Modal's standard Function rates ($0.0000131/core/s and $0.00000222/GiB/s); only Sandbox rates are used here.
 - Sandboxes run for at most 24 hours. The always-on scenario assumes you snapshot and restore into a new sandbox every 24 hours, which Modal documents but which isn't free of effort.
 - The 1 TiB/month free Volume allowance is applied per environment here; if it is per workspace (account), large teams may pay for storage sooner.
-- No official Codex CLI example was found in Modal docs or examples.
-- Unclear whether the plan container limits (Starter 100, Team 5000) cap concurrent Sandboxes; the blog cites up to 50,000 concurrent sandboxes per customer.
-- No SSH or browser-based web terminal is documented for Sandboxes; only `modal shell <sandbox-id>`, exec with PTY, and Tunnels.
-- Not stated whether region-selection (1.15-1.75x) or non-preemptible (3x) multipliers apply to Sandbox CPU/memory rates.
-- Storage pricing for retained snapshots (filesystem/directory/memory) is not published separately from Volumes.
-- Pricing for the VM runtime or nested virtualization (Team/Enterprise) is not separately itemized on the pricing page.
-- BYOC (running Modal Sandboxes in a customer's own cloud account) is not mentioned in official docs or pricing.
 
 ## Sources
 

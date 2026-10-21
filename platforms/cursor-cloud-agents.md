@@ -43,7 +43,7 @@ Last verified: **2026-10-19** · Official pricing: <https://cursor.com/pricing>
 - "Cursor-managed Cloud Agents include the execution infrastructure."
 - "Plans: Free $0, Plus $8, Premium $30, Super $100, Ultra $200, Teams $30+/user, Enterprise; "Cloud agents & automations" is not included on Free or Plus"
 
-## Caveats and open questions
+## Caveats
 
 - Cursor's plans changed in 2026 (Free, Plus, Premium, Super, Ultra, Teams, Enterprise); cloud agents start at Premium. Check the pricing page for current names and prices.
 - VM size, maximum run duration and idle timer values are not published.

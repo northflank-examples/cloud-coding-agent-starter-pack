@@ -113,15 +113,7 @@ docker run --rm --env-file .env cloud-agent run-task.sh opencode "Fix the failin
 - V2: API-key entry and paste-code OAuth in `opencode auth login` require an interactive terminal. ([source](https://opencode.ai/v2/docs/cli/providers/))
 - Docs state Anthropic prohibits using Claude Pro/Max via third-party plugins; bundled plugins were removed as of 1.3.0, so use an Anthropic API key. ([source](https://opencode.ai/docs/providers/))
 - Official Docker image: ghcr.io/anomalyco/opencode. ([source](https://opencode.ai/docs/))
-
-## Not documented / open questions
-
-- Which major version the guide should target: README on the dev branch installs @opencode/cli (V2), but opencode.ai/docs and GitHub releases are still V1 (1.19.3).
-- V2 CLI docs do not list `opencode run` flags (--auto, --format json, -m, -c); assumed unchanged from V1 per the migration guide's compatibility statement, but not explicitly documented for V2.
-- Exit codes of `opencode run` on failure are not documented.
-- Behaviour of `opencode run` when a permission resolves to "ask" without --auto (block, fail, or auto-reject) is not documented.
-- Whether ChatGPT Plus/Pro login works on a headless server (device code vs browser) in V1 is not documented; V2 TUI mentions 'Codex device code (legacy)'.
-- No telemetry opt-out documented.
+- Pass `--auto` in unattended runs, so an action that would normally ask for permission doesn't stall the run. ([source](https://opencode.ai/docs/permissions/))
 
 ## Sources
 

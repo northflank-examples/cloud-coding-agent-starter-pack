@@ -468,6 +468,14 @@
         {
           "text": "Do not set OPENAI_API_KEY or CODEX_API_KEY as job-level env vars in workflows running repository-controlled code",
           "source": "https://learn.chatgpt.com/docs/non-interactive-mode"
+        },
+        {
+          "text": "Authenticate `codex exec` with `CODEX_API_KEY` (or `codex login --with-api-key`); reading `OPENAI_API_KEY` directly isn't documented",
+          "source": "https://learn.chatgpt.com/docs/non-interactive-mode"
+        },
+        {
+          "text": "To stop update checks in images, set `check_for_update_on_startup = false` in `~/.codex/config.toml`; there's no environment variable for it",
+          "source": "https://learn.chatgpt.com/docs/config-file/config-reference"
         }
       ],
       "open_questions": [
@@ -664,6 +672,10 @@
         {
           "text": "The binary is `agent`; the install script also creates a legacy `cursor-agent` symlink, both in `~/.local/bin` (checked in the script on 2026-10-16)",
           "source": "https://cursor.com/install"
+        },
+        {
+          "text": "Always pass `--force` in headless runs: Cursor's docs disagree on whether print mode applies edits without it",
+          "source": "https://cursor.com/docs/cli/headless"
         }
       ],
       "open_questions": [
@@ -886,6 +898,10 @@
         {
           "text": "Official Docker image: ghcr.io/anomalyco/opencode",
           "source": "https://opencode.ai/docs/"
+        },
+        {
+          "text": "Pass `--auto` in unattended runs, so an action that would normally ask for permission doesn't stall the run",
+          "source": "https://opencode.ai/docs/permissions/"
         }
       ],
       "open_questions": [
@@ -1341,6 +1357,10 @@
         {
           "text": "plan.defaultOnStartup is ignored in print mode; use --plan-yolo for unattended plan-then-implement",
           "source": "https://github.com/can1357/oh-my-pi/blob/main/docs/cli-reference.md"
+        },
+        {
+          "text": "Pass `--yolo` in print mode even though it's the default: if a config sets a stricter approval mode, there's no UI to answer the prompt",
+          "source": "https://github.com/can1357/oh-my-pi/blob/main/docs/approval-mode.md"
         }
       ],
       "open_questions": [
@@ -1561,6 +1581,10 @@
         {
           "text": "DEVIN_SESSIONS_DIR can move the session history database, e.g. off an NFS home directory.",
           "source": "https://docs.devin.ai/cli/changelog/stable"
+        },
+        {
+          "text": "There's no JSON output for `devin -p`; use `--export <path>` to save the conversation to a file",
+          "source": "https://docs.devin.ai/cli/reference/commands"
         }
       ],
       "open_questions": [
@@ -1748,6 +1772,14 @@
         {
           "text": "Since there's no account, billing goes straight to whichever model provider's API key you use",
           "source": "https://aider.chat/docs/config/api-keys.html"
+        },
+        {
+          "text": "Add `--no-suggest-shell-commands` if you don't want Aider proposing shell commands in unattended runs",
+          "source": "https://aider.chat/docs/config/options.html"
+        },
+        {
+          "text": "Older docs use `--yes`; the current option is `--yes-always`",
+          "source": "https://aider.chat/docs/config/options.html"
         }
       ],
       "open_questions": [
@@ -2335,6 +2367,10 @@
         {
           "text": "With a shared `crush serve` backend, --yolo is first-wins per workspace",
           "source": "https://github.com/charmbracelet/crush"
+        },
+        {
+          "text": "`crush run` options are documented in `crush run --help` rather than the README, so check it on the version you install",
+          "source": "https://github.com/charmbracelet/crush/blob/main/internal/cmd/run.go"
         }
       ],
       "open_questions": [
@@ -2515,6 +2551,10 @@
         },
         {
           "text": "In `droid exec`, -r means --reasoning-effort, not --resume",
+          "source": "https://docs.factory.com/droid-cli/cli-reference"
+        },
+        {
+          "text": "There's no browserless login: use `FACTORY_API_KEY` on servers",
           "source": "https://docs.factory.com/droid-cli/cli-reference"
         }
       ],
@@ -3151,6 +3191,10 @@
         {
           "text": "Forked from Google Gemini CLI v0.8.2, developed independently since v0.1, so flags resemble Gemini CLI but differ",
           "source": "https://github.com/QwenLM/qwen-code"
+        },
+        {
+          "text": "To make sure Qwen Code reads `AGENTS.md`, add it to `context.fileName` in `.qwen/settings.json`",
+          "source": "https://qwenlm.github.io/qwen-code-docs/en/users/features/memory/"
         }
       ],
       "open_questions": [

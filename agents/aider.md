@@ -110,14 +110,8 @@ docker run --rm --env-file .env cloud-agent run-task.sh aider "Fix the failing t
 - In the official Docker image, run as your own UID (--user $(id -u):$(id -g)) and mount the repo at /app. ([source](https://aider.chat/docs/install/docker.html))
 - The pipx install supports only Python 3.9-3.12. aider-install / uv provision Python 3.12 automatically. ([source](https://aider.chat/docs/install.html))
 - Since there's no account, billing goes straight to whichever model provider's API key you use. ([source](https://aider.chat/docs/config/api-keys.html))
-
-## Not documented / open questions
-
-- The official docs don't mention MCP support.
-- There's no JSON or machine-readable output mode in the options reference.
-- It's not documented whether --yes-always auto-runs suggested shell commands in --message mode. To be safe, use --no-suggest-shell-commands.
-- The scripting page uses `--yes`, while the current options reference lists `--yes-always`.
-- The newest GitHub release (v0.86.0) is from 2025-08-09, while PyPI has 0.86.2. How actively it's maintained should be checked.
+- Add `--no-suggest-shell-commands` if you don't want Aider proposing shell commands in unattended runs. ([source](https://aider.chat/docs/config/options.html))
+- Older docs use `--yes`; the current option is `--yes-always`. ([source](https://aider.chat/docs/config/options.html))
 
 ## Sources
 

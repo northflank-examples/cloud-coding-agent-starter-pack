@@ -47,7 +47,7 @@ Last verified: **2026-10-19** · Official pricing: <https://www.daytona.io/prici
 | [100 tasks × 30 min](../scenarios/batch-tasks.md) | $8.28 | $0.00 | $8.28 |
 | [10 × 24/7 (month)](../scenarios/team-always-on.md) | $1,208.88 | $11.83 | $1,220.71 |
 
-## Caveats and open questions
+## Caveats
 
 - Disk is billed while the sandbox exists until it's archived (after 7 days stopped by default). Here it's priced for the full month.
 - Linux VM sandbox pricing isn't published (Windows VMs are listed at $0.0858/vCPU/h); container pricing is used here.

@@ -119,12 +119,6 @@ docker run --rm --env-file .env cloud-agent run-task.sh claude-code "Fix the fai
 - A -p run may wait up to 10 minutes idle for background work before exiting (CLAUDE_CODE_PRINT_BG_WAIT_CEILING_MS). ([source](https://code.claude.com/docs/en/headless))
 - In -p, an unset permission mode takes the built-in starting mode, which can be auto; pass --permission-mode explicitly. ([source](https://code.claude.com/docs/en/headless))
 
-## Not documented / open questions
-
-- Exact Bedrock/Vertex/Foundry companion env vars (AWS_REGION, ANTHROPIC_VERTEX_PROJECT_ID, CLOUD_ML_REGION etc.) not verified in this pass; see provider pages.
-- npm latest (2.1.301) may differ from the native installer 'stable' channel version.
-- Which environments count as a 'recognized sandbox' that skips the root check is not enumerated in the fetched docs.
-
 ## Sources
 
 - <https://code.claude.com/docs/en/authentication>

@@ -111,12 +111,6 @@ docker run --rm --env-file .env cloud-agent run-task.sh pi "Fix the failing test
 - JSON mode: stdout is strict JSONL; read it continuously or Pi can stall when the pipe buffer fills; diagnostics go to stderr. ([source](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/json.md))
 - Credential-printing commands (pi auth print-api-key) write secrets to stdout; be careful in CI logs. ([source](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/cli.md))
 
-## Not documented / open questions
-
-- GitHub release tag is v1.3.0 (2026-10-15); npm @earendil-works/pi-coding-agent latest is also 1.3.0. The old @mariozechner package stops at 0.73.1.
-- Exact exit codes of `pi -p` on model/tool failure are not documented in the pages reviewed.
-- Whether the pi.dev install.sh script installs Node.js non-interactively in a minimal container was not verified.
-
 ## Sources
 
 - <https://github.com/earendil-works/pi>

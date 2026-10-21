@@ -110,13 +110,6 @@ docker run --rm --env-file .env cloud-agent run-task.sh goose "Fix the failing t
 - Use --no-session for one-off runs and --max-turns to cap runaway execution. ([source](https://goose-docs.ai/docs/tutorials/headless-goose))
 - Homebrew formula/cask names still use the old 'block-goose' prefix. ([source](https://goose-docs.ai/docs/getting-started/installation))
 
-## Not documented / open questions
-
-- Exact exit-code semantics of `goose run` on tool/model failure are not documented beyond 'check exit codes'.
-- No documented OS-level sandbox for the developer extension's shell commands.
-- Whether `goose run` accepts the prompt as a positional argument (vs -t/-i) is not documented; use -t.
-- Whether the CLI auto-updates on its own: not documented; only manual `goose update` is described.
-
 ## Sources
 
 - <https://github.com/aaif-goose/goose>

@@ -39,7 +39,7 @@ Last verified: **2026-10-19** · Official pricing: <https://docs.github.com/en/c
 - "Coding agents consume GitHub Actions minutes and AI credits. Each agent session consumes AI credits based on the model used and the number of tokens processed."
 - "This total is converted into AI credits (1 AI credit = $0.01 USD)."
 
-## Caveats and open questions
+## Caveats
 
 - Per-minute Actions rates depend on runner size. See GitHub Actions billing.
 - Annual Pro/Pro+ subscribers on legacy billing are charged premium requests instead of AI credits.

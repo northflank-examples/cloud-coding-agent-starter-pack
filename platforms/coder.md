@@ -39,7 +39,7 @@ Last verified: **2026-10-19** · Official pricing: <https://coder.com/pricing>
 - "Community Free For hobbyists and small teams ready to join Coder's open-source community."
 - "Premium Annually per user"
 
-## Caveats and open questions
+## Caveats
 
 - Coder Tasks was removed in v2.34. Older comparisons that mention it are out of date.
 - You operate the control plane and the infrastructure yourself.

@@ -107,16 +107,6 @@ docker run --rm --env-file .env cloud-agent run-task.sh amp "Fix the failing tes
 - With plugins, pass --plugin-ready-timeout so execute mode waits for them to load. Otherwise agent.start/agent.end events are skipped. ([source](https://ampcode.com/docs/cli/execute-mode))
 - A server can act as a 'runner' (`amp --no-tui --runner-id <id>`) that runs threads started from other clients. ([source](https://ampcode.com/docs/cli))
 
-## Not documented / open questions
-
-- The CLI docs don't mention a --dangerously-allow-all flag. The current docs say Amp never asks for approval, so the flag may have been removed or may no longer matter.
-- The CLI docs don't document a command-line flag for choosing the mode or model in execute mode. The UI uses the Dial (Ctrl+S).
-- The Homebrew install command wasn't captured because it renders client-side.
-- No documented exit-code semantics for `amp -x`.
-- Where saved login credentials are stored on disk is not documented.
-- It's unclear whether the npm package @sourcegraph/amp is still a supported install method, since the docs show only the script and Homebrew.
-- No public license text or source repo was found.
-
 ## Sources
 
 - <https://ampcode.com/docs/cli>

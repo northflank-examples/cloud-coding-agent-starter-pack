@@ -66,14 +66,6 @@ Last verified: **2026-10-19** · Official pricing: <https://northflank.com/prici
 | [100 tasks × 30 min](../scenarios/batch-tasks.md) | $3.33 | $0.00 | $3.33 |
 | [10 × 24/7 (month)](../scenarios/team-always-on.md) | $486.62 | $30.00 | $516.62 |
 
-## Caveats and open questions
-
-- Harnesses are billed on Northflank's standard compute plans: the create-harness API requires billing.deploymentPlan. The pricing page doesn't mention harnesses by name.
-- The default harness size isn't published. The workspace volume is 5,120–102,400 MiB per the API; its default when omitted isn't stated.
-- No outbound egress allowlist for harnesses is documented.
-- Devin CLI and OMP harness types are documented in the create-harness API reference; Northflank's quickstart and product pages will list them in an upcoming docs update.
-- Some Cloud Harness details here (Kata microVMs, agents continuing to run after you disconnect, branch-scoped git push credentials, and a free-plan harness limit of 1 vCPU / 1 GB) come from Northflank's Cloud Harness product page, which isn't public yet as of 2026-10-19. Source links will be added when it's live.
-
 ## Sources
 
 - <https://api.northflank.com/v1/plans>

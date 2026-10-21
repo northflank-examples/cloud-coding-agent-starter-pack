@@ -472,7 +472,7 @@ The **agent** (Claude Code, Codex, OpenCode, Pi...) decides what to do. The **ha
 ## Methodology and sources
 
 - Values come only from **official vendor sources**: docs, official repositories and package registries, linked from each [agent guide](agents/README.md) and [platform page](platforms/). Anything not documented is marked as such, never assumed.
-- Agent flags were checked against each vendor's current CLI reference on the date shown. Agent CLIs change often, so each guide lists its open questions.
+- Agent flags were checked against each vendor's current CLI reference on the date shown. Agent CLIs change often, so check the vendor's docs if a flag stops working, and open an issue.
 - Platform prices are **list prices** for the default/US region, normalised to a 2 vCPU / 4 GiB environment. [`scripts/validate.py`](scripts/validate.py) checks the cost model against vendor-published prices.
 - CI fails if any generated table, agent guide or script block is out of date with the data. Details in [methodology.md](methodology.md).
 

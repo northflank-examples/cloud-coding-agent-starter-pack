@@ -49,7 +49,7 @@ Last verified: **2026-10-19** · Official pricing: <https://e2b.dev/pricing>
 | [100 tasks × 30 min](../scenarios/batch-tasks.md) | $8.28 | $0.00 | $8.28 |
 | [10 × 24/7 (month)](../scenarios/team-always-on.md) | $1,208.88 | $0.00 | $1,208.88 |
 
-## Caveats and open questions
+## Caveats
 
 - Storage for paused sandboxes isn't priced on the billing page, so it's counted as $0 here.
 - Always-on use needs Pro and pause/resume every 24 h, or Enterprise.

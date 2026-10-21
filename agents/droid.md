@@ -109,13 +109,7 @@ docker run --rm --env-file .env cloud-agent run-task.sh droid "Fix the failing t
 - The docs recommend installing xdg-utils on Linux. ([source](https://docs.factory.com/droid-cli/quickstart))
 - With the sandbox on and per-command mode, a command is blocked, not run unsandboxed, when bubblewrap or seccomp isn't available. ([source](https://docs.factory.com/autonomy-and-safety/sandbox))
 - In `droid exec`, -r means --reasoning-effort, not --resume. ([source](https://docs.factory.com/droid-cli/cli-reference))
-
-## Not documented / open questions
-
-- Docs have moved from docs.factory.ai to docs.factory.com. Both links appear in the docs; install URLs still use app.factory.ai.
-- There is no documented browserless or device-code login. Interactive sign-in uses the browser, so use FACTORY_API_KEY on servers.
-- No env var for disabling telemetry was found in the CLI docs. An enterprise telemetry page exists but wasn't checked.
-- The npm metadata points at a repo (github.com/Factory-AI/factory) that may not be public. The license is UNLICENSED.
+- There's no browserless login: use `FACTORY_API_KEY` on servers. ([source](https://docs.factory.com/droid-cli/cli-reference))
 
 ## Sources
 

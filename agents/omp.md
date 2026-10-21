@@ -116,14 +116,7 @@ docker run --rm --env-file .env cloud-agent run-task.sh omp "Fix the failing tes
 - omp loads .env files (project, ~/.omp/agent/.env, ~/.omp/.env, ~/.env) for unset keys, so secrets can be supplied without exporting. ([source](https://github.com/can1357/oh-my-pi/blob/main/docs/environment-variables.md))
 - Opening a repository loads its project settings, extensions, hooks, tools and MCP config by design; use --no-extensions / --config overlay with mcp.enableProjectConfig:false for untrusted repos. ([source](https://github.com/can1357/oh-my-pi/blob/main/README.md))
 - plan.defaultOnStartup is ignored in print mode; use --plan-yolo for unattended plan-then-implement. ([source](https://github.com/can1357/oh-my-pi/blob/main/docs/cli-reference.md))
-
-## Not documented / open questions
-
-- Vendor attribution: README says 'Built by Stencil Labs'; npm author is 'Stencil Labs, Inc.'; repo lives under personal account can1357 (Can Bölük). Exact corporate relationship not documented.
-- No documented env var/setting found to disable the compiled binary's startup update check (update.* settings exist but specific keys were not confirmed).
-- What happens in -p (print) mode if a tool requires approval under always-ask/write mode (no UI to answer) is not documented in sources read.
-- Whether 'omp login <provider>' for Anthropic/Codex OAuth works fully over SSH without a local browser (callback-paste vs device code) varies per provider; only factory-droid is explicitly documented as device-code.
-- Homepage teases 'omp², soon!' — no details on a future product or pricing.
+- Pass `--yolo` in print mode even though it's the default: if a config sets a stricter approval mode, there's no UI to answer the prompt. ([source](https://github.com/can1357/oh-my-pi/blob/main/docs/approval-mode.md))
 
 ## Sources
 
